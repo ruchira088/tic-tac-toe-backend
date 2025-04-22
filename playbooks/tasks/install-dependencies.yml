@@ -1,0 +1,7 @@
+- name: Install pip dependencies
+  pip:
+    name:
+      - boto3
+      - botocore
+      - kubernetes
+      - pygithub

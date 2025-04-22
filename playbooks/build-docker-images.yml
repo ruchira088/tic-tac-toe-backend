@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Build Docker image
+      import_tasks: tasks/build-and-publish-docker-image.yml
+      vars:
+        app: api
+        dockerfile: Dockerfile.j2
+        publish: false

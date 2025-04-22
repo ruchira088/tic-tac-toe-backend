@@ -1,0 +1,84 @@
+import java.time.Instant
+
+plugins {
+    id 'application'
+    id 'com.github.ben-manes.versions' version "$dependencyUpdatesPluginVersion"
+    id 'net.researchgate.release' version "$releasePluginVersion"
+    id 'jacoco'
+}
+
+group = 'com.ruchij'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(
+            "io.javalin:javalin-bundle:$javalinVersion",
+            "com.typesafe:config:$typesafeConfigVersion",
+            "ch.qos.logback:logback-classic:$logbackVersion"
+    )
+
+    testImplementation(
+            "org.junit.jupiter:junit-jupiter:$junitVersion",
+            "org.junit.platform:junit-platform-launcher:$junitPlatformVersion",
+            "org.mockito:mockito-core:$mockitoVersion"
+    )
+}
+
+application {
+    mainClass = 'com.ruchij.App'
+}
+
+tasks.register('buildInformation') {
+    doLast {
+        def file = new File("${getLayout().getProjectDirectory()}/build/resources/main/build-information.json")
+        file.parentFile.mkdirs()
+
+        if (file.exists()) {
+            file.delete()
+        }
+
+        def buildInfo =
+                """{
+                "name": "javalin-seed",
+                "group": "${project.group}",
+                "version": "${project.version}",
+                "gradleVersion": "${gradle.gradleVersion}",
+                "buildTimestamp": "${Instant.now()}",
+                "gitBranch": "${'git rev-parse --abbrev-ref HEAD'.execute().text.trim()}",
+                "gitCommit": "${'git rev-parse --short HEAD'.execute().text.trim()}"
+            }"""
+
+        file.withWriter('UTF-8') { writer ->
+            writer.write(buildInfo)
+        }
+    }
+}
+
+processResources {
+    dependsOn buildInformation
+}
+
+release {
+    preTagCommitMessage = 'Setting release version: '
+    newVersionCommitMessage = 'Setting development version: '
+    pushReleaseVersionBranch = 'main'
+
+    git {
+        requireBranch.set('dev')
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+distTar {
+    archiveFileName = 'api.tar'
+}
+
+jacocoTestReport {
+    dependsOn test
+}

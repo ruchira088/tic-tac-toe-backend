@@ -27,7 +27,7 @@ public class MongoUserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findById(String userId) {
-        return Optional.ofNullable(userCollection.find(Filters.eq("id", userId)).first());
+        return Optional.ofNullable(userCollection.find(Filters.eq("_id", userId)).first());
     }
 
     @Override

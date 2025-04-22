@@ -2,6 +2,7 @@ package com.ruchij.web;
 
 import com.ruchij.service.health.HealthService;
 import com.ruchij.service.user.UserService;
+import com.ruchij.web.middleware.Authenticator;
 import com.ruchij.web.routes.ServiceRoute;
 import com.ruchij.web.routes.UserRoute;
 import io.javalin.apibuilder.EndpointGroup;
@@ -13,10 +14,10 @@ public class Routes implements EndpointGroup {
     private final UserRoute userRoute;
 
     public Routes(UserService userService, HealthService healthService) {
-        this(
-                new UserRoute(userService),
-                new ServiceRoute(healthService)
-        );
+        Authenticator authenticator = new Authenticator(userService);
+
+        this.userRoute = new UserRoute(userService, authenticator);
+        this.serviceRoute = new ServiceRoute(healthService);
     }
 
     public Routes(UserRoute userRoute, ServiceRoute serviceRoute) {

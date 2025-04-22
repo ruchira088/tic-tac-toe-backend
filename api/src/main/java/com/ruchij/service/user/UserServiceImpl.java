@@ -2,6 +2,7 @@ package com.ruchij.service.user;
 
 import com.ruchij.dao.user.UserDao;
 import com.ruchij.dao.user.models.User;
+import com.ruchij.exception.ResourceNotFoundException;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -33,5 +34,14 @@ public class UserServiceImpl implements UserService {
         this.userDao.insert(user);
 
         return user;
+    }
+
+    @Override
+    public User getUserById(String userId) throws ResourceNotFoundException {
+        Optional<User> user = this.userDao.findById(userId);
+
+        return user.orElseThrow(
+                () -> new ResourceNotFoundException("Unable to find user with ID=%s".formatted(userId))
+        );
     }
 }

@@ -1,7 +1,16 @@
 package com.ruchij;
 
+import com.github.javafaker.Faker;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import com.ruchij.config.ApplicationConfiguration;
+import com.ruchij.dao.user.MongoUserDaoImpl;
+import com.ruchij.dao.user.UserDao;
 import com.ruchij.service.health.HealthServiceImpl;
+import com.ruchij.service.user.RandomGenerator;
+import com.ruchij.service.user.RandomGeneratorImpl;
+import com.ruchij.service.user.UserServiceImpl;
 import com.ruchij.utils.JsonUtils;
 import com.ruchij.web.Routes;
 import com.typesafe.config.Config;
@@ -24,20 +33,32 @@ public class App {
         Routes routes = routes(applicationConfiguration, properties, clock);
 
         javalin(routes)
-            .start(applicationConfiguration.httpConfiguration().port());
+                .start(applicationConfiguration.httpConfiguration().port());
     }
 
     public static Javalin javalin(Routes routes) {
         return Javalin.create(javalinConfig -> {
-              javalinConfig.jsonMapper(new JavalinJackson(JsonUtils.objectMapper, true));
-              javalinConfig.router.apiBuilder(routes);
-          });
+            javalinConfig.jsonMapper(new JavalinJackson(JsonUtils.objectMapper, true));
+            javalinConfig.router.apiBuilder(routes);
+        });
     }
 
-    private static Routes routes(ApplicationConfiguration applicationConfiguration, Properties properties, Clock clock)
-        throws IOException {
+    private static Routes routes(
+            ApplicationConfiguration applicationConfiguration,
+            Properties properties,
+            Clock clock
+    )
+            throws IOException {
+        MongoClient mongoClient = MongoClients.create(applicationConfiguration.mongoConfiguration().connectionUrl());
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(applicationConfiguration.mongoConfiguration().database());
+
+        UserDao userDao = new MongoUserDaoImpl(mongoDatabase);
+        Faker faker = Faker.instance();
+        RandomGenerator randomGenerator = new RandomGeneratorImpl(userDao, faker);
+
+        UserServiceImpl userService = new UserServiceImpl(userDao, randomGenerator, clock);
         HealthServiceImpl healthService = HealthServiceImpl.create(clock, properties);
 
-        return new Routes(healthService);
+        return new Routes(userService, healthService);
     }
 }

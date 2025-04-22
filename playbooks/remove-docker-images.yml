@@ -4,4 +4,4 @@
 
   tasks:
     - name: Remove created Docker images
-      shell: docker images | grep "javalin-seed" | awk '{print $3}' | xargs docker rmi -f
+      shell: docker images | grep "tic-tac-toe-backend" | awk '{print $3}' | xargs docker rmi -f

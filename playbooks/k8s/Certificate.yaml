@@ -1,10 +1,10 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: javalin-seed-certificate
+  name: tic-tac-toe-backend-certificate
   namespace: {{ namespace }}
 spec:
-  secretName: javalin-seed-tls
+  secretName: tic-tac-toe-backend-tls
   issuerRef:
     kind: ClusterIssuer
     name: lets-encrypt

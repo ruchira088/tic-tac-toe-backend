@@ -3,6 +3,7 @@ package com.ruchij.web.routes;
 import com.ruchij.App;
 import com.ruchij.service.health.HealthService;
 import com.ruchij.service.health.models.ServiceInformation;
+import com.ruchij.service.user.UserService;
 import com.ruchij.web.Routes;
 import io.javalin.testtools.JavalinTest;
 import okhttp3.Response;
@@ -18,12 +19,13 @@ class ServiceRouteTest {
 
     @Test
     void shouldReturnServiceInformation() {
+        UserService userService = Mockito.mock(UserService.class);
         HealthService healthService = Mockito.mock(HealthService.class);
         Instant timestamp = Instant.parse("2023-02-05T04:37:42.566735Z");
 
         Mockito.when(healthService.serviceInformation())
             .thenReturn(new ServiceInformation(
-                "javalin-seed",
+                "tic-tac-toe-backend",
                 "0.0.1-SNAPSHOT",
                 "17.0.5",
                 "7.6",
@@ -33,7 +35,7 @@ class ServiceRouteTest {
                 timestamp
             ));
 
-        Routes routes = new Routes(healthService);
+        Routes routes = new Routes(userService, healthService);
 
         JavalinTest.test(App.javalin(routes), ((server, client) -> {
             Response response = client.get("/service/info");
@@ -41,7 +43,7 @@ class ServiceRouteTest {
 
             String expectedResponseBody = """
                 {
-                    "serviceName": "javalin-seed",
+                    "serviceName": "tic-tac-toe-backend",
                     "serviceVersion": "0.0.1-SNAPSHOT",
                     "javaVersion": "17.0.5",
                     "gradleVersion": "7.6",

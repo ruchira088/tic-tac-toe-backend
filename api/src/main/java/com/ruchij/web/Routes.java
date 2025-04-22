@@ -1,25 +1,33 @@
 package com.ruchij.web;
 
 import com.ruchij.service.health.HealthService;
+import com.ruchij.service.user.UserService;
 import com.ruchij.web.routes.ServiceRoute;
+import com.ruchij.web.routes.UserRoute;
 import io.javalin.apibuilder.EndpointGroup;
 
 import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class Routes implements EndpointGroup {
     private final ServiceRoute serviceRoute;
+    private final UserRoute userRoute;
 
-    public Routes(HealthService healthService) {
-        this(new ServiceRoute(healthService));
+    public Routes(UserService userService, HealthService healthService) {
+        this(
+                new UserRoute(userService),
+                new ServiceRoute(healthService)
+        );
     }
 
-    public Routes(ServiceRoute serviceRoute) {
+    public Routes(UserRoute userRoute, ServiceRoute serviceRoute) {
+        this.userRoute = userRoute;
         this.serviceRoute = serviceRoute;
     }
 
     @Override
     public void addEndpoints() {
-        path("service", serviceRoute);
+        path("service", this.serviceRoute);
+        path("user", this.userRoute);
     }
 
 }

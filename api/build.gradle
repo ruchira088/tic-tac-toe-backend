@@ -15,14 +15,20 @@ repositories {
 
 dependencies {
     implementation(
+            platform("org.mongodb:mongodb-driver-bom:$mongoDriverVersion"),
             "io.javalin:javalin-bundle:$javalinVersion",
             "com.typesafe:config:$typesafeConfigVersion",
-            "ch.qos.logback:logback-classic:$logbackVersion"
+            "ch.qos.logback:logback-classic:$logbackVersion",
+            'org.mongodb:mongodb-driver-sync',
+            'com.fasterxml.jackson.datatype:jackson-datatype-jdk8',
+            "com.github.javafaker:javafaker:$fakerVersion"
+
     )
 
     testImplementation(
-            "org.junit.jupiter:junit-jupiter:$junitVersion",
-            "org.junit.platform:junit-platform-launcher:$junitPlatformVersion",
+            platform("org.junit:junit-bom:$junitVersion"),
+            'org.junit.jupiter:junit-jupiter',
+            'org.junit.platform:junit-platform-launcher',
             "org.mockito:mockito-core:$mockitoVersion"
     )
 }
@@ -42,7 +48,7 @@ tasks.register('buildInformation') {
 
         def buildInfo =
                 """{
-                "name": "javalin-seed",
+                "name": "tic-tac-toe-backend",
                 "group": "${project.group}",
                 "version": "${project.version}",
                 "gradleVersion": "${gradle.gradleVersion}",

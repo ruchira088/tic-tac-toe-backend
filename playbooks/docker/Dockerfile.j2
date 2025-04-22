@@ -1,13 +1,13 @@
 FROM eclipse-temurin:21-jre
 
-LABEL org.opencontainers.image.source=https://github.com/ruchira088/javalin-seed
+LABEL org.opencontainers.image.source=https://github.com/ruchira088/tic-tac-toe-backend
 
 ENV GIT_BRANCH {{ git_branch }}
 ENV GIT_COMMIT {{ git_commit }}
 ENV BUILD_TIMESTAMP {{ build_timestamp }}
 
-WORKDIR /opt/javalin-seed-{{ app }}
+WORKDIR /opt/tic-tac-toe-backend-{{ app }}
 
 ADD {{ app }}.tar .
 
-CMD [ "/opt/javalin-seed-{{ app }}/{{ app }}/bin/{{ app }}" ]
+CMD [ "/opt/tic-tac-toe-backend-{{ app }}/{{ app }}/bin/{{ app }}" ]

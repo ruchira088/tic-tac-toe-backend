@@ -10,5 +10,7 @@ public interface UserDao {
 
     Optional<User> findById(String userId);
 
+    Optional<User> findByName(String name);
+
     List<User> searchByName(String name);
 }

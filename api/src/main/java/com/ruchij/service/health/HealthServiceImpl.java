@@ -46,7 +46,7 @@ public class HealthServiceImpl implements HealthService {
 
         if (inputStream == null) {
             buildInformation = new BuildInformation(
-                    "javalin-seed",
+                    "tic-tac-toe-backend",
                     "com.ruchij",
                     "UNKNOWN",
                     "UNKNOWN",

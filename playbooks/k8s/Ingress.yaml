@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: javalin-seed-ingress
+  name: tic-tac-toe-backend-ingress
   namespace: {{ namespace }}
 spec:
   tls:
-    - secretName: javalin-seed-tls
+    - secretName: tic-tac-toe-backend-tls
       hosts:
         - {{ hostname }}
   rules:
@@ -15,6 +15,6 @@ spec:
           - pathType: ImplementationSpecific
             backend:
               service:
-                name: javalin-seed-service
+                name: tic-tac-toe-backend-service
                 port:
                   name: javalin-port

@@ -1,4 +1,4 @@
-package com.ruchij.service.user;
+package com.ruchij.service.random;
 
 import java.util.UUID;
 

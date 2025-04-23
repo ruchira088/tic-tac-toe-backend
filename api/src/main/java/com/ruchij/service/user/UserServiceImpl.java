@@ -3,6 +3,7 @@ package com.ruchij.service.user;
 import com.ruchij.dao.user.UserDao;
 import com.ruchij.dao.user.models.User;
 import com.ruchij.exception.ResourceNotFoundException;
+import com.ruchij.service.random.RandomGenerator;
 
 import java.time.Clock;
 import java.time.Instant;

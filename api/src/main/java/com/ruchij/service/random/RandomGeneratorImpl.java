@@ -1,4 +1,4 @@
-package com.ruchij.service.user;
+package com.ruchij.service.random;
 
 import com.github.javafaker.Faker;
 import com.ruchij.dao.user.UserDao;

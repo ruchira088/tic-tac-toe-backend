@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface GameEngine {
     Game.Player isValidMove(Game game, String playerId, Game.Coordinate coordinate) throws ValidationException;
 
-    Optional<Game.Player> getWinner(Game game);
+    Optional<Game.Winner> getWinner(Game game);
 }

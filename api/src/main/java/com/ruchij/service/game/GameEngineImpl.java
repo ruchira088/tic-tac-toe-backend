@@ -61,7 +61,7 @@ public class GameEngineImpl implements GameEngine {
     }
 
     @Override
-    public Optional<Game.Player> getWinner(Game game) {
+    public Optional<Game.Winner> getWinner(Game game) {
         if (game.moves().size() < GRID_SIZE * 2 - 1) {
             return Optional.empty();
         }
@@ -70,17 +70,25 @@ public class GameEngineImpl implements GameEngine {
                 .skip(game.moves().size() - GRID_SIZE * 2)
                 .collect(Collectors.groupingBy(move -> move.player()));
 
-        return Optional.empty();
+        Optional<Game.Winner> winner = movesByPlayer.entrySet().stream()
+                .flatMap(entry -> {
+                    List<Game.Coordinate> coordinates = entry.getValue().stream().map(Game.Move::coordinate).toList();
+
+                    return isWinner(coordinates)
+                            .map(winningRule -> new Game.Winner(entry.getKey(), winningRule))
+                            .stream();
+                })
+                .findFirst();
+
+        return winner;
     }
 
-    boolean isWinner(List<Game.Coordinate> coordinates) {
-        if (coordinates.size() < GRID_SIZE) {
-            return false;
-        } else {
+    Optional<Game.WinningRule> isWinner(List<Game.Coordinate> coordinates) {
+        if (coordinates.size() >= GRID_SIZE) {
             HashSet<Game.Coordinate> coordinateHashSet = new HashSet<>(coordinates);
 
             if (coordinateHashSet.size() != coordinates.size()) {
-                return false;
+                return Optional.empty();
             }
 
             Game.Coordinate baseCoordinate = coordinates.getFirst();
@@ -88,8 +96,16 @@ public class GameEngineImpl implements GameEngine {
             boolean isHorizontalWin =
                     coordinates.stream().allMatch(coordinate -> coordinate.y() == baseCoordinate.y());
 
+            if (isHorizontalWin) {
+                return Optional.of(Game.WinningRule.Horizontal);
+            }
+
             boolean isVerticalWin =
                     coordinates.stream().allMatch(coordinate -> coordinate.x() == baseCoordinate.x());
+
+            if (isVerticalWin) {
+                return Optional.of(Game.WinningRule.Vertical);
+            }
 
             HashSet<Game.Coordinate> rightDiagonal = new HashSet<>();
             HashSet<Game.Coordinate> leftDiagonal = new HashSet<>();
@@ -102,8 +118,13 @@ public class GameEngineImpl implements GameEngine {
             boolean isRightDiagonalWin = rightDiagonal.containsAll(coordinates);
             boolean isLeftDiagonalWin = leftDiagonal.containsAll(coordinates);
 
-            return isHorizontalWin || isVerticalWin || isLeftDiagonalWin || isRightDiagonalWin;
+            if (isRightDiagonalWin || isLeftDiagonalWin) {
+                return Optional.of(Game.WinningRule.Diagonal);
+            }
+
         }
+
+        return Optional.empty();
     }
 
 }

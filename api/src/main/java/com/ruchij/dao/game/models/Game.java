@@ -4,6 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public record Game(
         @BsonId
@@ -14,10 +15,18 @@ public record Game(
         Instant startedAt,
         String playerOneId,
         String playerTwoId,
-        List<Move> moves
+        List<Move> moves,
+        Optional<Winner> winner
 ) {
     public enum Player {
         PlayerOne, PlayerTwo
+    }
+
+    public enum WinningRule {
+        Diagonal, Horizontal, Vertical
+    }
+
+    public record Winner(Player player, WinningRule winningRule) {
     }
 
     public record Coordinate(int x, int y) {

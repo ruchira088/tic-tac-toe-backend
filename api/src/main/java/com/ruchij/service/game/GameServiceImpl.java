@@ -77,7 +77,8 @@ public class GameServiceImpl implements GameService {
                 instant,
                 pendingGame.createdBy(),
                 otherPlayerId,
-                List.of()
+                List.of(),
+                Optional.empty()
         );
 
         this.gameDao.insertGame(game);
@@ -99,6 +100,8 @@ public class GameServiceImpl implements GameService {
         Game updatedGame =
                 this.gameDao.updateGame(game)
                         .orElseThrow(() -> new RuntimeException("Game id=%s not found. This is most likely due to a concurrency issue".formatted(game.id())));
+
+        this.gameEngine.getWinner(updatedGame);
 
         return updatedGame;
     }

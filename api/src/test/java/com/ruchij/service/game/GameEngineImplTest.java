@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
 
 class GameEngineImplTest {
     private static final GameEngineImpl gameEngineImpl = new GameEngineImpl();
@@ -18,7 +17,7 @@ class GameEngineImplTest {
             * * *
             * * *
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(0, 0),
                         new Game.Coordinate(1, 0),
@@ -31,7 +30,7 @@ class GameEngineImplTest {
             X X X
             * * *
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(0, 1),
                         new Game.Coordinate(1, 1),
@@ -44,7 +43,7 @@ class GameEngineImplTest {
             * * *
             X X X
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(0, 2),
                         new Game.Coordinate(1, 2),
@@ -60,7 +59,7 @@ class GameEngineImplTest {
             X * *
             X * *
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(0, 0),
                         new Game.Coordinate(0, 1),
@@ -73,7 +72,7 @@ class GameEngineImplTest {
             * X *
             * X *
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(1, 0),
                         new Game.Coordinate(1, 1),
@@ -86,7 +85,7 @@ class GameEngineImplTest {
             * * X
             * * X
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(2, 0),
                         new Game.Coordinate(2, 1),
@@ -102,7 +101,7 @@ class GameEngineImplTest {
              * X *
              X * *
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Diagonal), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(2, 0),
                         new Game.Coordinate(1, 1),
@@ -118,7 +117,7 @@ class GameEngineImplTest {
              * X *
              * * X
          */
-        Assertions.assertTrue(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Diagonal), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(2, 2),
                         new Game.Coordinate(1, 1),
@@ -134,7 +133,7 @@ class GameEngineImplTest {
              * X *
              * X *
          */
-        Assertions.assertFalse(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(1, 2),
                         new Game.Coordinate(1, 1),
@@ -147,7 +146,7 @@ class GameEngineImplTest {
              * X *
              * * *
          */
-        Assertions.assertFalse(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(1, 1),
                         new Game.Coordinate(1, 1),
@@ -160,7 +159,7 @@ class GameEngineImplTest {
              * X *
              * * X
          */
-        Assertions.assertFalse(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(1, 0),
                         new Game.Coordinate(1, 1),
@@ -173,7 +172,7 @@ class GameEngineImplTest {
              * X *
              * * X
          */
-        Assertions.assertFalse(gameEngineImpl.isWinner(
+        Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
                 List.of(
                         new Game.Coordinate(2, 0),
                         new Game.Coordinate(1, 1),

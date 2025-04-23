@@ -92,16 +92,37 @@ public class GameServiceImpl implements GameService {
         Game game = this.gameDao.findGameById(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("Unable to find game with id=%s".formatted(gameId)));
 
+        if (game.winner().isPresent()) {
+            throw new ValidationException("Game gameId=%s already has a winner".formatted(game.id()));
+        }
+
         Game.Player player = this.gameEngine.isValidMove(game, playerId, coordinate);
         Instant instant = this.clock.instant();
 
         game.moves().add(new Game.Move(player, instant, coordinate));
 
-        Game updatedGame =
-                this.gameDao.updateGame(game)
-                        .orElseThrow(() -> new RuntimeException("Game id=%s not found. This is most likely due to a concurrency issue".formatted(game.id())));
+        Optional<Game.Winner> winner = this.gameEngine.getWinner(game);
 
-        this.gameEngine.getWinner(updatedGame);
+        Game updatedGame =
+                new Game(
+                        game.id(),
+                        game.name(),
+                        game.createdAt(),
+                        game.createdBy(),
+                        game.startedAt(),
+                        game.playerOneId(),
+                        game.playerTwoId(),
+                        game.moves(),
+                        winner
+                );
+
+        this.gameDao.updateGame(updatedGame)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Game id=%s not found. This is most likely due to a concurrency issue"
+                                        .formatted(game.id())
+                        )
+                );
 
         return updatedGame;
     }

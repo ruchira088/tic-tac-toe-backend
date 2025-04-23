@@ -1,6 +1,7 @@
 package com.ruchij.web.routes;
 
 import com.ruchij.App;
+import com.ruchij.service.game.GameService;
 import com.ruchij.service.health.HealthService;
 import com.ruchij.service.health.models.ServiceInformation;
 import com.ruchij.service.user.UserService;
@@ -20,7 +21,9 @@ class ServiceRouteTest {
     @Test
     void shouldReturnServiceInformation() {
         UserService userService = Mockito.mock(UserService.class);
+        GameService gameService = Mockito.mock(GameService.class);
         HealthService healthService = Mockito.mock(HealthService.class);
+
         Instant timestamp = Instant.parse("2023-02-05T04:37:42.566735Z");
 
         Mockito.when(healthService.serviceInformation())
@@ -35,7 +38,7 @@ class ServiceRouteTest {
                 timestamp
             ));
 
-        Routes routes = new Routes(userService, healthService);
+        Routes routes = new Routes(userService, gameService, healthService);
 
         JavalinTest.test(App.javalin(routes), ((server, client) -> {
             Response response = client.get("/service/info");

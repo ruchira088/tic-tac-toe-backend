@@ -1,5 +1,6 @@
 package com.ruchij.web;
 
+import com.ruchij.service.game.GameService;
 import com.ruchij.service.health.HealthService;
 import com.ruchij.service.user.UserService;
 import com.ruchij.web.middleware.Authenticator;
@@ -15,18 +16,18 @@ public class Routes implements EndpointGroup {
     private final UserRoute userRoute;
     private final GameRoute gameRoute;
 
-    public Routes(UserService userService, HealthService healthService) {
+    public Routes(UserService userService, GameService gameService, HealthService healthService) {
         Authenticator authenticator = new Authenticator(userService);
 
         this.userRoute = new UserRoute(userService, authenticator);
         this.serviceRoute = new ServiceRoute(healthService);
-        this.gameRoute = null;
+        this.gameRoute = new GameRoute(gameService, authenticator);
     }
 
-    public Routes(UserRoute userRoute, ServiceRoute serviceRoute) {
+    public Routes(UserRoute userRoute, GameRoute gameRoute, ServiceRoute serviceRoute) {
         this.userRoute = userRoute;
         this.serviceRoute = serviceRoute;
-        this.gameRoute = null;
+        this.gameRoute = gameRoute;
     }
 
     @Override

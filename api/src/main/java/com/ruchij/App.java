@@ -5,11 +5,19 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.ruchij.config.ApplicationConfiguration;
+import com.ruchij.dao.game.GameDao;
+import com.ruchij.dao.game.MongoGameDaoImpl;
 import com.ruchij.dao.user.MongoUserDaoImpl;
 import com.ruchij.dao.user.UserDao;
+import com.ruchij.service.game.GameEngine;
+import com.ruchij.service.game.GameEngineImpl;
+import com.ruchij.service.game.GameService;
+import com.ruchij.service.game.GameServiceImpl;
+import com.ruchij.service.health.HealthService;
 import com.ruchij.service.health.HealthServiceImpl;
 import com.ruchij.service.random.RandomGenerator;
 import com.ruchij.service.random.RandomGeneratorImpl;
+import com.ruchij.service.user.UserService;
 import com.ruchij.service.user.UserServiceImpl;
 import com.ruchij.utils.JsonUtils;
 import com.ruchij.web.Routes;
@@ -56,9 +64,14 @@ public class App {
         Faker faker = Faker.instance();
         RandomGenerator randomGenerator = new RandomGeneratorImpl(userDao, faker);
 
-        UserServiceImpl userService = new UserServiceImpl(userDao, randomGenerator, clock);
-        HealthServiceImpl healthService = HealthServiceImpl.create(clock, properties);
+        UserService userService = new UserServiceImpl(userDao, randomGenerator, clock);
 
-        return new Routes(userService, healthService);
+        GameDao gameDao = new MongoGameDaoImpl(mongoDatabase);
+        GameEngine gameEngine = new GameEngineImpl();
+        GameService gameService = new GameServiceImpl(gameDao, gameEngine, clock, randomGenerator);
+
+        HealthService healthService = HealthServiceImpl.create(clock, properties);
+
+        return new Routes(userService, gameService, healthService);
     }
 }

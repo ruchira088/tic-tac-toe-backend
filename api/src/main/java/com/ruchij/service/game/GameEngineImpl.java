@@ -3,28 +3,19 @@ package com.ruchij.service.game;
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.exception.ValidationException;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameEngineImpl implements GameEngine {
     private static final int GRID_SIZE = 3;
 
     @Override
-    public Game.Player isValidMove(Game game, String playerId, Game.Coordinate coordinate) throws ValidationException {
+    public void checkMove(Game game, String playerId, Game.Coordinate coordinate) throws ValidationException {
         if (game.winner().isPresent()) {
             throw new ValidationException("Game gameId=%s already has a winner".formatted(game.id()));
         }
 
-        Game.Player player;
-
-        if (game.playerOneId().equalsIgnoreCase(playerId)) {
-            player = Game.Player.PlayerOne;
-        } else if (game.playerTwoId().equalsIgnoreCase(playerId)) {
-            player = Game.Player.PlayerTwo;
-        } else {
+        if (!Set.of(game.playerOneId(), game.playerTwoId()).contains(playerId)) {
             throw new ValidationException("playerId=%s is not a player in gameId=%s".formatted(playerId, game.id()));
         }
 
@@ -36,21 +27,11 @@ public class GameEngineImpl implements GameEngine {
             throw new ValidationException("%s is NOT vacant".formatted(coordinate));
         }
 
-        Game.Player currentTurn;
+        boolean isPlayerTurn =
+            (game.moves().isEmpty() && game.playerOneId().equals(playerId)) ||
+                !game.moves().getLast().playerId().equals(playerId);
 
-        if (game.moves().isEmpty()) {
-            currentTurn = Game.Player.PlayerOne;
-        } else {
-            Game.Move lastMove = game.moves().getLast();
-
-            if (lastMove.player() == Game.Player.PlayerOne) {
-                currentTurn = Game.Player.PlayerTwo;
-            } else {
-                currentTurn = Game.Player.PlayerOne;
-            }
-        }
-
-        if (currentTurn != player) {
+        if (!isPlayerTurn) {
             throw new ValidationException(
                     "It is NOT the current turn for playerId=%s in gameId=%s"
                             .formatted(playerId, game.moves())
@@ -60,8 +41,6 @@ public class GameEngineImpl implements GameEngine {
         if (coordinate.x() < 0 || coordinate.x() >= GRID_SIZE || coordinate.y() < 0 || coordinate.y() >= GRID_SIZE) {
             throw new ValidationException("Coordinate x=%s, y=%s is out of bounds".formatted(coordinate.x(), coordinate.y()));
         }
-
-        return player;
     }
 
     @Override
@@ -70,9 +49,9 @@ public class GameEngineImpl implements GameEngine {
             return Optional.empty();
         }
 
-        Map<Game.Player, List<Game.Move>> movesByPlayer = game.moves().stream()
+        Map<String, List<Game.Move>> movesByPlayer = game.moves().stream()
                 .skip(game.moves().size() - GRID_SIZE * 2)
-                .collect(Collectors.groupingBy(move -> move.player()));
+                .collect(Collectors.groupingBy(move -> move.playerId()));
 
         Optional<Game.Winner> winner = movesByPlayer.entrySet().stream()
                 .flatMap(entry -> {

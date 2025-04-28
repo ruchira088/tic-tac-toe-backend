@@ -7,31 +7,27 @@ import java.util.List;
 import java.util.Optional;
 
 public record Game(
-        @BsonId
-        String id,
-        String name,
-        Instant createdAt,
-        String createdBy,
-        Instant startedAt,
-        String playerOneId,
-        String playerTwoId,
-        List<Move> moves,
-        Optional<Winner> winner
+    @BsonId
+    String id,
+    String name,
+    Instant createdAt,
+    String createdBy,
+    Instant startedAt,
+    String playerOneId,
+    String playerTwoId,
+    List<Move> moves,
+    Optional<Winner> winner
 ) {
-    public enum Player {
-        PlayerOne, PlayerTwo
-    }
+  public enum WinningRule {
+    Diagonal, Horizontal, Vertical
+  }
 
-    public enum WinningRule {
-        Diagonal, Horizontal, Vertical
-    }
+  public record Winner(String playerId, WinningRule winningRule) {
+  }
 
-    public record Winner(Player player, WinningRule winningRule) {
-    }
+  public record Coordinate(int x, int y) {
+  }
 
-    public record Coordinate(int x, int y) {
-    }
-
-    public record Move(Player player, Instant performedAt, Coordinate coordinate) {
-    }
+  public record Move(String playerId, Instant performedAt, Coordinate coordinate) {
+  }
 }

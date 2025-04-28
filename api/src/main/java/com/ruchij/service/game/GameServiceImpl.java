@@ -98,10 +98,10 @@ public class GameServiceImpl implements GameService {
             throw new ValidationException("Game gameId=%s already has a winner".formatted(game.id()));
         }
 
-        Game.Player player = this.gameEngine.isValidMove(game, playerId, coordinate);
-        Instant instant = this.clock.instant();
+        this.gameEngine.checkMove(game, playerId, coordinate);
 
-        game.moves().add(new Game.Move(player, instant, coordinate));
+        Instant instant = this.clock.instant();
+        game.moves().add(new Game.Move(playerId, instant, coordinate));
 
         Optional<Game.Winner> winner = this.gameEngine.getWinner(game);
 

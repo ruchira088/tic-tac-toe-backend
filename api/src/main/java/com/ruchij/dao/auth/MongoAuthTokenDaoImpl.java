@@ -3,17 +3,24 @@ package com.ruchij.dao.auth;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.ruchij.dao.auth.models.AuthToken;
+import org.bson.Document;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class MongoAuthTokenDaoImpl implements AuthTokenDao {
     private final MongoCollection<AuthToken> authTokenCollection;
 
     public MongoAuthTokenDaoImpl(MongoDatabase mongoDatabase) {
         this.authTokenCollection = mongoDatabase.getCollection("auth_tokens", AuthToken.class);
+        this.authTokenCollection.createIndex(
+            Indexes.ascending("issuedAt"), new IndexOptions().expireAfter(30L, TimeUnit.DAYS)
+        );
     }
 
     @Override

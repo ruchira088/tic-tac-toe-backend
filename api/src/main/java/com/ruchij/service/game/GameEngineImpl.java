@@ -14,6 +14,10 @@ public class GameEngineImpl implements GameEngine {
 
     @Override
     public Game.Player isValidMove(Game game, String playerId, Game.Coordinate coordinate) throws ValidationException {
+        if (game.winner().isPresent()) {
+            throw new ValidationException("Game gameId=%s already has a winner".formatted(game.id()));
+        }
+
         Game.Player player;
 
         if (game.playerOneId().equalsIgnoreCase(playerId)) {

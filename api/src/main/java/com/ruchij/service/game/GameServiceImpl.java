@@ -7,12 +7,14 @@ import com.ruchij.exception.ResourceConflictException;
 import com.ruchij.exception.ResourceNotFoundException;
 import com.ruchij.exception.ValidationException;
 import com.ruchij.service.random.RandomGenerator;
+import com.ruchij.utils.Either;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class GameServiceImpl implements GameService {
     private final GameDao gameDao;
@@ -125,5 +127,19 @@ public class GameServiceImpl implements GameService {
                 );
 
         return updatedGame;
+    }
+
+    @Override
+    public Either<PendingGame, Game> findGameById(String gameId) throws ResourceNotFoundException {
+        Optional<Either<PendingGame, Game>> game = this.gameDao.findGameById(gameId)
+                .map(Either::<PendingGame, Game>right)
+                .or(() -> this.gameDao.findPendingGameById(gameId).map(Either::<PendingGame, Game>left));
+
+        return game.orElseThrow(() -> new ResourceNotFoundException("Game with gameId=%s not found".formatted(gameId)));
+    }
+
+    @Override
+    public void registerForUpdates(String gameId, String playerId, Consumer<Game.Move> consumer) {
+
     }
 }

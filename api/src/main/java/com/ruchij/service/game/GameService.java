@@ -5,6 +5,9 @@ import com.ruchij.dao.game.models.PendingGame;
 import com.ruchij.exception.ResourceConflictException;
 import com.ruchij.exception.ResourceNotFoundException;
 import com.ruchij.exception.ValidationException;
+import com.ruchij.utils.Either;
+
+import java.util.function.Consumer;
 
 public interface GameService {
     PendingGame createGame(String name, String playerId);
@@ -17,4 +20,8 @@ public interface GameService {
             String playerId,
             Game.Coordinate coordinate
             ) throws ResourceNotFoundException, ValidationException;
+
+    Either<PendingGame, Game> findGameById(String gameId) throws ResourceNotFoundException;
+
+    void registerForUpdates(String gameId, String playerId, Consumer<Game.Move> consumer);
 }

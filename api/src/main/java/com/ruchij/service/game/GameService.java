@@ -13,15 +13,22 @@ public interface GameService {
     PendingGame createGame(String name, String playerId);
 
     Game startGame(String pendingGameId, String otherPlayerId)
-            throws ResourceNotFoundException, ResourceConflictException;
+        throws ResourceNotFoundException, ResourceConflictException;
 
     Game addMove(
-            String gameId,
-            String playerId,
-            Game.Coordinate coordinate
-            ) throws ResourceNotFoundException, ValidationException;
+        String gameId,
+        String playerId,
+        Game.Coordinate coordinate
+    ) throws ResourceNotFoundException, ValidationException;
 
     Either<PendingGame, Game> findGameById(String gameId) throws ResourceNotFoundException;
 
-    void registerForUpdates(String gameId, String playerId, Consumer<Game.Move> consumer);
+    String registerForUpdates(
+        String gameId,
+        String playerId,
+        Consumer<Game.Move> moveUpdates,
+        Consumer<Game.Winner> winnerUpdates
+    ) throws ResourceNotFoundException;
+
+    void unregisterForUpdates(String registrationId);
 }

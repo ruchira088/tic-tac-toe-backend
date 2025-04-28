@@ -46,6 +46,7 @@ public class App {
 
     public static Javalin javalin(Routes routes) {
         return Javalin.create(javalinConfig -> {
+            javalinConfig.useVirtualThreads = true;
             javalinConfig.jsonMapper(new JavalinJackson(JsonUtils.objectMapper, true));
             javalinConfig.router.apiBuilder(routes);
         });

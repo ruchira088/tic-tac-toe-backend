@@ -11,9 +11,8 @@ import com.ruchij.utils.Either;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class GameServiceImpl implements GameService {
@@ -21,6 +20,9 @@ public class GameServiceImpl implements GameService {
     private final GameEngine gameEngine;
     private final Clock clock;
     private final RandomGenerator randomGenerator;
+    private final Map<String, Map<String, Consumer<Game.Move>>> moveUpdates = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Consumer<Game.Winner>>> winnerUpdates = new ConcurrentHashMap<>();
+    private final Map<String, String> registrationIdToGameId = new ConcurrentHashMap<>();
 
     public GameServiceImpl(GameDao gameDao, GameEngine gameEngine, Clock clock, RandomGenerator randomGenerator) {
         this.gameDao = gameDao;
@@ -42,11 +44,11 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game startGame(String pendingGameId, String otherPlayerId)
-            throws ResourceNotFoundException, ResourceConflictException {
+        throws ResourceNotFoundException, ResourceConflictException {
         PendingGame pendingGame = this.gameDao.findPendingGameById(pendingGameId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Unable to find pending game with ID=%s".formatted(pendingGameId))
-                );
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Unable to find pending game with ID=%s".formatted(pendingGameId))
+            );
 
         if (pendingGame.gameStartedAt().isPresent()) {
             throw new ResourceConflictException("Game has already started");
@@ -55,32 +57,32 @@ public class GameServiceImpl implements GameService {
         Instant instant = this.clock.instant();
 
         PendingGame updatedPendingGame = new PendingGame(
-                pendingGame.id(),
-                pendingGame.name(),
-                pendingGame.createdAt(),
-                pendingGame.createdBy(),
-                Optional.of(instant)
+            pendingGame.id(),
+            pendingGame.name(),
+            pendingGame.createdAt(),
+            pendingGame.createdBy(),
+            Optional.of(instant)
         );
 
         Optional<PendingGame> updatedGame = this.gameDao.updatePendingGame(updatedPendingGame);
 
         if (updatedGame.isEmpty()) {
             throw new RuntimeException(
-                    "Pending game id=%s not found. This is most likely due to a concurrency issue"
-                            .formatted(pendingGame.id())
+                "Pending game id=%s not found. This is most likely due to a concurrency issue"
+                    .formatted(pendingGame.id())
             );
         }
 
         Game game = new Game(
-                pendingGame.id(),
-                pendingGame.name(),
-                pendingGame.createdAt(),
-                pendingGame.createdBy(),
-                instant,
-                pendingGame.createdBy(),
-                otherPlayerId,
-                List.of(),
-                Optional.empty()
+            pendingGame.id(),
+            pendingGame.name(),
+            pendingGame.createdAt(),
+            pendingGame.createdBy(),
+            instant,
+            pendingGame.createdBy(),
+            otherPlayerId,
+            List.of(),
+            Optional.empty()
         );
 
         this.gameDao.insertGame(game);
@@ -88,11 +90,15 @@ public class GameServiceImpl implements GameService {
         return game;
     }
 
+    private Game getGameById(String gameId) throws ResourceNotFoundException {
+        return this.gameDao.findGameById(gameId)
+            .orElseThrow(() -> new ResourceNotFoundException("Unable to find game with id=%s".formatted(gameId)));
+    }
+
     @Override
     public Game addMove(String gameId, String playerId, Game.Coordinate coordinate)
-            throws ResourceNotFoundException, ValidationException {
-        Game game = this.gameDao.findGameById(gameId)
-                .orElseThrow(() -> new ResourceNotFoundException("Unable to find game with id=%s".formatted(gameId)));
+        throws ResourceNotFoundException, ValidationException {
+        Game game = this.getGameById(gameId);
 
         if (game.winner().isPresent()) {
             throw new ValidationException("Game gameId=%s already has a winner".formatted(game.id()));
@@ -101,30 +107,38 @@ public class GameServiceImpl implements GameService {
         this.gameEngine.checkMove(game, playerId, coordinate);
 
         Instant instant = this.clock.instant();
-        game.moves().add(new Game.Move(playerId, instant, coordinate));
+
+        Game.Move move = new Game.Move(playerId, instant, coordinate);
+        game.moves().add(move);
 
         Optional<Game.Winner> winner = this.gameEngine.getWinner(game);
 
         Game updatedGame =
-                new Game(
-                        game.id(),
-                        game.name(),
-                        game.createdAt(),
-                        game.createdBy(),
-                        game.startedAt(),
-                        game.playerOneId(),
-                        game.playerTwoId(),
-                        game.moves(),
-                        winner
-                );
+            new Game(
+                game.id(),
+                game.name(),
+                game.createdAt(),
+                game.createdBy(),
+                game.startedAt(),
+                game.playerOneId(),
+                game.playerTwoId(),
+                game.moves(),
+                winner
+            );
 
         this.gameDao.updateGame(updatedGame)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Game id=%s not found. This is most likely due to a concurrency issue"
-                                        .formatted(game.id())
-                        )
-                );
+            .orElseThrow(() ->
+                new RuntimeException(
+                    "Game id=%s not found. This is most likely due to a concurrency issue"
+                        .formatted(game.id())
+                )
+            );
+
+        this.moveUpdates.getOrDefault(gameId, new HashMap<>())
+            .forEach((__, moveUpdates) -> moveUpdates.accept(move));
+
+        winner.ifPresent(gameWinner -> this.winnerUpdates.getOrDefault(gameId, new HashMap<>())
+            .forEach((__, winnerUpdates) -> winnerUpdates.accept(gameWinner)));
 
         return updatedGame;
     }
@@ -132,14 +146,42 @@ public class GameServiceImpl implements GameService {
     @Override
     public Either<PendingGame, Game> findGameById(String gameId) throws ResourceNotFoundException {
         Optional<Either<PendingGame, Game>> game = this.gameDao.findGameById(gameId)
-                .map(Either::<PendingGame, Game>right)
-                .or(() -> this.gameDao.findPendingGameById(gameId).map(Either::<PendingGame, Game>left));
+            .map(Either::<PendingGame, Game>right)
+            .or(() -> this.gameDao.findPendingGameById(gameId).map(Either::<PendingGame, Game>left));
 
         return game.orElseThrow(() -> new ResourceNotFoundException("Game with gameId=%s not found".formatted(gameId)));
     }
 
     @Override
-    public void registerForUpdates(String gameId, String playerId, Consumer<Game.Move> consumer) {
+    public String registerForUpdates(
+        String gameId,
+        String playerId,
+        Consumer<Game.Move> moveUpdates,
+        Consumer<Game.Winner> winnerUpdates
+    ) throws ResourceNotFoundException {
+        // Check that the game exists
+        this.getGameById(gameId);
 
+        String registrationId = this.randomGenerator.uuid().toString();
+
+        this.registrationIdToGameId.put(registrationId, gameId);
+
+        this.moveUpdates.computeIfAbsent(registrationId, __ -> new ConcurrentHashMap<>())
+            .put(playerId, moveUpdates);
+
+        this.winnerUpdates.computeIfAbsent(registrationId, __ -> new ConcurrentHashMap<>())
+            .put(playerId, winnerUpdates);
+
+        return registrationId;
+    }
+
+    @Override
+    public void unregisterForUpdates(String registrationId) {
+        String gameId = this.registrationIdToGameId.remove(registrationId);
+
+        if (gameId != null) {
+            this.moveUpdates.getOrDefault(gameId, new HashMap<>()).remove(registrationId);
+            this.winnerUpdates.getOrDefault(gameId, new HashMap<>()).remove(registrationId);
+        }
     }
 }

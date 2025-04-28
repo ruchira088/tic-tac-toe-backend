@@ -1,9 +1,10 @@
 package com.ruchij.web;
 
+import com.ruchij.service.auth.AuthenticationService;
 import com.ruchij.service.game.GameService;
 import com.ruchij.service.health.HealthService;
 import com.ruchij.service.user.UserService;
-import com.ruchij.web.middleware.Authenticator;
+import com.ruchij.web.routes.AuthRoute;
 import com.ruchij.web.routes.GameRoute;
 import com.ruchij.web.routes.ServiceRoute;
 import com.ruchij.web.routes.UserRoute;
@@ -15,19 +16,25 @@ public class Routes implements EndpointGroup {
     private final ServiceRoute serviceRoute;
     private final UserRoute userRoute;
     private final GameRoute gameRoute;
+    private final AuthRoute authRoute;
 
-    public Routes(UserService userService, GameService gameService, HealthService healthService) {
-        Authenticator authenticator = new Authenticator(userService);
-
-        this.userRoute = new UserRoute(userService, authenticator);
+    public Routes(
+        UserService userService,
+        GameService gameService,
+        AuthenticationService authenticationService,
+        HealthService healthService
+    ) {
+        this.userRoute = new UserRoute(userService, authenticationService);
         this.serviceRoute = new ServiceRoute(healthService);
-        this.gameRoute = new GameRoute(gameService, authenticator);
+        this.gameRoute = new GameRoute(gameService, authenticationService);
+        this.authRoute = new AuthRoute(authenticationService);
     }
 
-    public Routes(UserRoute userRoute, GameRoute gameRoute, ServiceRoute serviceRoute) {
+    public Routes(UserRoute userRoute, GameRoute gameRoute, ServiceRoute serviceRoute, AuthRoute authRoute) {
         this.userRoute = userRoute;
         this.serviceRoute = serviceRoute;
         this.gameRoute = gameRoute;
+        this.authRoute = authRoute;
     }
 
     @Override
@@ -35,6 +42,7 @@ public class Routes implements EndpointGroup {
         path("service", this.serviceRoute);
         path("user", this.userRoute);
         path("game", this.gameRoute);
+        path("auth", this.authRoute);
     }
 
 }

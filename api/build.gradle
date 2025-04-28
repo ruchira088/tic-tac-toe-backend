@@ -21,6 +21,7 @@ dependencies {
             "ch.qos.logback:logback-classic:$logbackVersion",
             'org.mongodb:mongodb-driver-sync',
             'com.fasterxml.jackson.datatype:jackson-datatype-jdk8',
+            "org.mindrot:jbcrypt:$jbcryptVersion",
             "com.github.javafaker:javafaker:$fakerVersion"
 
     )

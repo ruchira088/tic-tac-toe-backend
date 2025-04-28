@@ -3,6 +3,7 @@ package com.ruchij.web.routes;
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.dao.game.models.PendingGame;
 import com.ruchij.dao.user.models.User;
+import com.ruchij.service.auth.AuthenticationService;
 import com.ruchij.service.game.GameService;
 import com.ruchij.utils.Either;
 import com.ruchij.web.middleware.Authenticator;
@@ -17,9 +18,9 @@ public class GameRoute implements EndpointGroup {
     private final GameService gameService;
     private final Authenticator authenticator;
 
-    public GameRoute(GameService gameService, Authenticator authenticator) {
+    public GameRoute(GameService gameService, AuthenticationService authenticationService) {
         this.gameService = gameService;
-        this.authenticator = authenticator;
+        this.authenticator = new Authenticator(authenticationService);
     }
 
     @Override

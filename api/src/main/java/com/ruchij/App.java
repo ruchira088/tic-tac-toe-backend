@@ -5,14 +5,20 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.ruchij.config.ApplicationConfiguration;
+import com.ruchij.dao.auth.AuthTokenDao;
+import com.ruchij.dao.auth.MongoAuthTokenDaoImpl;
 import com.ruchij.dao.game.GameDao;
 import com.ruchij.dao.game.MongoGameDaoImpl;
 import com.ruchij.dao.user.MongoUserDaoImpl;
 import com.ruchij.dao.user.UserDao;
+import com.ruchij.service.auth.AuthenticationService;
+import com.ruchij.service.auth.AuthenticationServiceImpl;
 import com.ruchij.service.game.GameEngine;
 import com.ruchij.service.game.GameEngineImpl;
 import com.ruchij.service.game.GameService;
 import com.ruchij.service.game.GameServiceImpl;
+import com.ruchij.service.hashing.BcryptPasswordHashingService;
+import com.ruchij.service.hashing.PasswordHashingService;
 import com.ruchij.service.health.HealthService;
 import com.ruchij.service.health.HealthServiceImpl;
 import com.ruchij.service.random.RandomGenerator;
@@ -61,18 +67,23 @@ public class App {
         MongoClient mongoClient = MongoClients.create(applicationConfiguration.mongoConfiguration().connectionUrl());
         MongoDatabase mongoDatabase = mongoClient.getDatabase(applicationConfiguration.mongoConfiguration().database());
 
+        PasswordHashingService passwordHashingService = new BcryptPasswordHashingService();
         UserDao userDao = new MongoUserDaoImpl(mongoDatabase);
         Faker faker = Faker.instance();
         RandomGenerator randomGenerator = new RandomGeneratorImpl(userDao, faker);
 
-        UserService userService = new UserServiceImpl(userDao, randomGenerator, clock);
+        UserService userService = new UserServiceImpl(userDao, passwordHashingService, randomGenerator, clock);
 
         GameDao gameDao = new MongoGameDaoImpl(mongoDatabase);
         GameEngine gameEngine = new GameEngineImpl();
         GameService gameService = new GameServiceImpl(gameDao, gameEngine, clock, randomGenerator);
 
+        AuthTokenDao authTokenDao = new MongoAuthTokenDaoImpl(mongoDatabase);
+        AuthenticationService authenticationService =
+            new AuthenticationServiceImpl(userDao, authTokenDao, passwordHashingService, randomGenerator, clock);
+
         HealthService healthService = HealthServiceImpl.create(clock, properties);
 
-        return new Routes(userService, gameService, healthService);
+        return new Routes(userService, gameService, authenticationService, healthService);
     }
 }

@@ -36,4 +36,9 @@ public class RandomGeneratorImpl implements RandomGenerator {
     public UUID uuid() {
         return UUID.randomUUID();
     }
+
+    @Override
+    public String password() {
+        return this.faker.internet().password(10, 20, true, true, true);
+    }
 }

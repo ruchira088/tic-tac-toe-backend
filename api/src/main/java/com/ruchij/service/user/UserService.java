@@ -7,7 +7,7 @@ import com.ruchij.exception.ResourceNotFoundException;
 import java.util.Optional;
 
 public interface UserService {
-    User registerUser(Optional<String> name);
+    User registerUser(Optional<String> name, Optional<String> password);
 
     User getUserById(String userId) throws ResourceNotFoundException;
 }

@@ -2,7 +2,7 @@ package com.ruchij.web.middleware;
 
 import com.ruchij.dao.user.models.User;
 import com.ruchij.exception.AuthenticationException;
-import com.ruchij.service.user.UserService;
+import com.ruchij.service.auth.AuthenticationService;
 import io.javalin.http.Context;
 import io.javalin.http.Header;
 
@@ -11,10 +11,10 @@ import java.util.Map;
 public class Authenticator {
     private static final String AUTH_TYPE = "Bearer";
 
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
-    public Authenticator(UserService userService) {
-        this.userService = userService;
+    public Authenticator(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     public User authenticate(Map<String, String> headerMap) throws Exception {
@@ -28,9 +28,8 @@ public class Authenticator {
             throw new AuthenticationException("Unsupported auth type");
         }
 
-        String userId = authorizationHeader.substring(AUTH_TYPE.length()).trim();
-
-        User user = this.userService.getUserById(userId);
+        String token = authorizationHeader.substring(AUTH_TYPE.length()).trim();
+        User user = this.authenticationService.authenticate(token);
 
         return user;
     }

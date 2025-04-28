@@ -6,4 +6,6 @@ public interface RandomGenerator {
     String username();
 
     UUID uuid();
+
+    String password();
 }

@@ -47,7 +47,7 @@ public class App {
         Routes routes = routes(applicationConfiguration, properties, clock);
 
         javalin(routes)
-                .start(applicationConfiguration.httpConfiguration().port());
+            .start(applicationConfiguration.httpConfiguration().port());
     }
 
     public static Javalin javalin(Routes routes) {
@@ -59,26 +59,27 @@ public class App {
     }
 
     private static Routes routes(
-            ApplicationConfiguration applicationConfiguration,
-            Properties properties,
-            Clock clock
+        ApplicationConfiguration applicationConfiguration,
+        Properties properties,
+        Clock clock
     )
-            throws IOException {
+        throws IOException {
+        String mongoCollectionNamePrefix = applicationConfiguration.mongoConfiguration().collectionNameSuffix();
         MongoClient mongoClient = MongoClients.create(applicationConfiguration.mongoConfiguration().connectionUrl());
         MongoDatabase mongoDatabase = mongoClient.getDatabase(applicationConfiguration.mongoConfiguration().database());
 
         PasswordHashingService passwordHashingService = new BcryptPasswordHashingService();
-        UserDao userDao = new MongoUserDaoImpl(mongoDatabase);
+        UserDao userDao = new MongoUserDaoImpl(mongoDatabase, mongoCollectionNamePrefix);
         Faker faker = Faker.instance();
         RandomGenerator randomGenerator = new RandomGeneratorImpl(userDao, faker);
 
         UserService userService = new UserServiceImpl(userDao, passwordHashingService, randomGenerator, clock);
 
-        GameDao gameDao = new MongoGameDaoImpl(mongoDatabase);
+        GameDao gameDao = new MongoGameDaoImpl(mongoDatabase, mongoCollectionNamePrefix);
         GameEngine gameEngine = new GameEngineImpl();
         GameService gameService = new GameServiceImpl(gameDao, gameEngine, clock, randomGenerator);
 
-        AuthTokenDao authTokenDao = new MongoAuthTokenDaoImpl(mongoDatabase);
+        AuthTokenDao authTokenDao = new MongoAuthTokenDaoImpl(mongoDatabase, mongoCollectionNamePrefix);
         AuthenticationService authenticationService =
             new AuthenticationServiceImpl(userDao, authTokenDao, passwordHashingService, randomGenerator, clock);
 

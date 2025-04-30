@@ -16,8 +16,8 @@ public class MongoUserDaoImpl implements UserDao {
     private final MongoCollection<User> userCollection;
     private final MongoCollection<UserCredentials> userCredentialsCollection;
 
-    public MongoUserDaoImpl(MongoDatabase mongoDatabase) {
-        this.userCollection = mongoDatabase.getCollection("users", User.class);
+    public MongoUserDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
+        this.userCollection = mongoDatabase.getCollection("users-%s".formatted(collectionNameSuffix), User.class);
         this.userCredentialsCollection = mongoDatabase.getCollection("user_credentials", UserCredentials.class);
     }
 

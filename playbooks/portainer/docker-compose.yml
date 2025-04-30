@@ -1,6 +1,7 @@
 services:
   mongo:
     image: mongo:8
+    restart: unless-stopped
     healthcheck:
       test: [
         "CMD",

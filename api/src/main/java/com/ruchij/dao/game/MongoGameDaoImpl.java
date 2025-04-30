@@ -14,8 +14,8 @@ public class MongoGameDaoImpl implements GameDao {
     private final MongoCollection<PendingGame> pendingGamesCollection;
     private final MongoCollection<Game> gamesCollection;
 
-    public MongoGameDaoImpl(MongoDatabase mongoDatabase) {
-        this.pendingGamesCollection = mongoDatabase.getCollection("pending_games", PendingGame.class);
+    public MongoGameDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
+        this.pendingGamesCollection = mongoDatabase.getCollection("pending_games-%s".formatted(collectionNameSuffix), PendingGame.class);
         this.gamesCollection = mongoDatabase.getCollection("games", Game.class);
     }
 
@@ -29,7 +29,7 @@ public class MongoGameDaoImpl implements GameDao {
     @Override
     public Optional<PendingGame> updatePendingGame(PendingGame pendingGame) {
         UpdateResult updateResult =
-                this.pendingGamesCollection.replaceOne(Filters.eq("_id", pendingGame.id()), pendingGame);
+            this.pendingGamesCollection.replaceOne(Filters.eq("_id", pendingGame.id()), pendingGame);
 
         if (updateResult.getModifiedCount() > 0) {
             return Optional.of(pendingGame);
@@ -41,9 +41,9 @@ public class MongoGameDaoImpl implements GameDao {
     @Override
     public Optional<PendingGame> findPendingGameById(String pendingGameId) {
         Optional<PendingGame> pendingGame = Optional.ofNullable(
-                this.pendingGamesCollection
-                        .find(Filters.eq("_id", pendingGameId))
-                        .first()
+            this.pendingGamesCollection
+                .find(Filters.eq("_id", pendingGameId))
+                .first()
         );
 
         return pendingGame;

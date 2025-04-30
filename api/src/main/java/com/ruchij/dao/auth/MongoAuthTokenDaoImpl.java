@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 public class MongoAuthTokenDaoImpl implements AuthTokenDao {
     private final MongoCollection<AuthToken> authTokenCollection;
 
-    public MongoAuthTokenDaoImpl(MongoDatabase mongoDatabase) {
-        this.authTokenCollection = mongoDatabase.getCollection("auth_tokens", AuthToken.class);
+    public MongoAuthTokenDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
+        this.authTokenCollection = mongoDatabase.getCollection("auth_tokens-%s".formatted(collectionNameSuffix), AuthToken.class);
         this.authTokenCollection.createIndex(
             Indexes.ascending("issuedAt"), new IndexOptions().expireAfter(30L, TimeUnit.DAYS)
         );

@@ -8,6 +8,8 @@ import com.mongodb.client.result.UpdateResult;
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.dao.game.models.PendingGame;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class MongoGameDaoImpl implements GameDao {
@@ -70,5 +72,10 @@ public class MongoGameDaoImpl implements GameDao {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<PendingGame> getPendingGames(int limit, int offset) {
+        return this.pendingGamesCollection.find().skip(offset).limit(limit).into(new ArrayList<>());
     }
 }

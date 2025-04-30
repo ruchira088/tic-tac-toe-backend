@@ -7,7 +7,6 @@ import com.ruchij.exception.ResourceConflictException;
 import com.ruchij.exception.ResourceNotFoundException;
 import com.ruchij.exception.ValidationException;
 import com.ruchij.service.random.RandomGenerator;
-import com.ruchij.utils.Either;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -144,12 +143,19 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Either<PendingGame, Game> findGameById(String gameId) throws ResourceNotFoundException {
-        Optional<Either<PendingGame, Game>> game = this.gameDao.findGameById(gameId)
-            .map(Either::<PendingGame, Game>right)
-            .or(() -> this.gameDao.findPendingGameById(gameId).map(Either::<PendingGame, Game>left));
+    public Game findGameById(String gameId) throws ResourceNotFoundException {
+        Game game = this.gameDao.findGameById(gameId)
+            .orElseThrow(() -> new ResourceNotFoundException("Game with gameId=%s not found".formatted(gameId)));
 
-        return game.orElseThrow(() -> new ResourceNotFoundException("Game with gameId=%s not found".formatted(gameId)));
+        return game;
+    }
+
+    @Override
+    public PendingGame findPendingGameById(String pendingGameId) throws ResourceNotFoundException {
+        PendingGame pendingGame = this.gameDao.findPendingGameById(pendingGameId)
+            .orElseThrow(() -> new ResourceNotFoundException("Error finding pending game with pendingGameId=%s".formatted(pendingGameId)));
+
+        return pendingGame;
     }
 
     @Override
@@ -183,5 +189,10 @@ public class GameServiceImpl implements GameService {
             this.moveUpdates.getOrDefault(gameId, new HashMap<>()).remove(registrationId);
             this.winnerUpdates.getOrDefault(gameId, new HashMap<>()).remove(registrationId);
         }
+    }
+
+    @Override
+    public List<PendingGame> getPendingGames(int limit, int offset) {
+        return this.gameDao.getPendingGames(limit, offset);
     }
 }

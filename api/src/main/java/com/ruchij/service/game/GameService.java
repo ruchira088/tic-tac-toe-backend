@@ -5,8 +5,8 @@ import com.ruchij.dao.game.models.PendingGame;
 import com.ruchij.exception.ResourceConflictException;
 import com.ruchij.exception.ResourceNotFoundException;
 import com.ruchij.exception.ValidationException;
-import com.ruchij.utils.Either;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface GameService {
@@ -21,7 +21,9 @@ public interface GameService {
         Game.Coordinate coordinate
     ) throws ResourceNotFoundException, ValidationException;
 
-    Either<PendingGame, Game> findGameById(String gameId) throws ResourceNotFoundException;
+    Game findGameById(String gameId) throws ResourceNotFoundException;
+
+    PendingGame findPendingGameById(String pendingGameId) throws ResourceNotFoundException;
 
     String registerForUpdates(
         String gameId,
@@ -31,4 +33,6 @@ public interface GameService {
     ) throws ResourceNotFoundException;
 
     void unregisterForUpdates(String registrationId);
+
+    List<PendingGame> getPendingGames(int limit, int offset);
 }

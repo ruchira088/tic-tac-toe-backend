@@ -3,6 +3,7 @@ package com.ruchij.dao.game;
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.dao.game.models.PendingGame;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GameDao {
@@ -17,4 +18,6 @@ public interface GameDao {
     Optional<Game> findGameById(String gameId);
 
     Optional<Game> updateGame(Game game);
+
+    List<PendingGame> getPendingGames(int limit, int offset);
 }

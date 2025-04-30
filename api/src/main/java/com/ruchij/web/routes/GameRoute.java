@@ -5,12 +5,14 @@ import com.ruchij.dao.game.models.PendingGame;
 import com.ruchij.dao.user.models.User;
 import com.ruchij.service.auth.AuthenticationService;
 import com.ruchij.service.game.GameService;
-import com.ruchij.utils.Either;
 import com.ruchij.web.middleware.Authenticator;
 import com.ruchij.web.requests.NewGameRequest;
+import com.ruchij.web.responses.PaginatedResponse;
 import com.ruchij.web.responses.WebSocketResponse;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
+
+import java.util.List;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -25,31 +27,49 @@ public class GameRoute implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
-        post("/", context -> {
-            User user = this.authenticator.authenticate(context);
-            NewGameRequest newGameRequest = context.bodyAsClass(NewGameRequest.class);
+        path("/pending", () -> {
+            post(context -> {
+                User user = this.authenticator.authenticate(context);
+                NewGameRequest newGameRequest = context.bodyAsClass(NewGameRequest.class);
 
-            PendingGame pendingGame = this.gameService.createGame(newGameRequest.gameTitle(), user.id());
+                PendingGame pendingGame = this.gameService.createGame(newGameRequest.gameTitle(), user.id());
 
-            context.status(HttpStatus.CREATED).json(pendingGame);
+                context.status(HttpStatus.CREATED).json(pendingGame);
+            });
+
+            get(context -> {
+                User user = this.authenticator.authenticate(context);
+
+                int offset = context.queryParamAsClass("offset", Integer.class).getOrDefault(0);
+                int limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
+
+                List<PendingGame> pendingGames = this.gameService.getPendingGames(limit, offset);
+
+                context.status(HttpStatus.OK).json(new PaginatedResponse<>(pendingGames, offset, limit));
+            });
+
+            path("/id/{gameId}", () -> {
+                get(context -> {
+                    String gameId = context.pathParam("gameId");
+                    PendingGame pendingGame = this.gameService.findPendingGameById(gameId);
+                    context.status(HttpStatus.OK).json(pendingGame);
+                });
+
+                post("/join", context -> {
+                    User user = this.authenticator.authenticate(context);
+                    String gameId = context.pathParam("gameId");
+
+                    Game game = this.gameService.startGame(gameId, user.id());
+
+                    context.status(HttpStatus.OK).json(game);
+                });
+            });
         });
 
         path("/id/{gameId}", () -> {
             get(context -> {
                 String gameId = context.pathParam("gameId");
-                Either<PendingGame, Game> eitherGame = this.gameService.findGameById(gameId);
-
-                Record result = eitherGame.fold(pendingGame -> pendingGame, game -> game);
-
-                context.status(HttpStatus.OK).json(result);
-            });
-
-            post("/join", context -> {
-                User user = this.authenticator.authenticate(context);
-                String gameId = context.pathParam("gameId");
-
-                Game game = this.gameService.startGame(gameId, user.id());
-
+                Game game = this.gameService.findGameById(gameId);
                 context.status(HttpStatus.OK).json(game);
             });
 

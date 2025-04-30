@@ -8,7 +8,6 @@ import com.ruchij.service.hashing.PasswordHashingService;
 import com.ruchij.service.random.RandomGenerator;
 
 import java.time.Clock;
-import java.time.Instant;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
@@ -29,14 +28,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(Optional<String> name, Optional<String> password) {
+    public User registerUser(Optional<String> username, Optional<String> password) {
         String userId = this.randomGenerator.uuid().toString();
-        String username = name.orElseGet(this.randomGenerator::username);
+
+        User user = new User(
+            userId,
+            username.orElseGet(this.randomGenerator::username),
+            this.clock.instant()
+        );
+
         String userPassword = password.orElseGet(this.randomGenerator::password);
-        Instant timestamp = this.clock.instant();
-
-        User user = new User(userId, username, timestamp);
-
         String hashedPassword = this.passwordHashingService.hashPassword(userPassword);
         UserCredentials userCredentials = new UserCredentials(userId, hashedPassword);
 

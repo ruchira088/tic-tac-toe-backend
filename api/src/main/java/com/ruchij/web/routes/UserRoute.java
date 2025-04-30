@@ -29,7 +29,7 @@ public class UserRoute implements EndpointGroup {
         post("/", context -> {
             UserRegistrationRequest userRegistrationRequest = context.bodyAsClass(UserRegistrationRequest.class);
 
-            User user = this.userService.registerUser(userRegistrationRequest.name(), userRegistrationRequest.password());
+            User user = this.userService.registerUser(userRegistrationRequest.username(), userRegistrationRequest.password());
             AuthToken authToken = this.authenticationService.createAuthToken(user.id());
 
             context.status(HttpStatus.CREATED).json(new UserRegistrationResponse(authToken, user));

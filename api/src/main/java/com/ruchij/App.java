@@ -82,7 +82,7 @@ public class App {
         AuthenticationService authenticationService =
             new AuthenticationServiceImpl(userDao, authTokenDao, passwordHashingService, randomGenerator, clock);
 
-        HealthService healthService = HealthServiceImpl.create(clock, properties);
+        HealthService healthService = HealthServiceImpl.create(mongoDatabase, clock, properties);
 
         return new Routes(userService, gameService, authenticationService, healthService);
     }

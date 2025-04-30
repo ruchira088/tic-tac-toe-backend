@@ -1,12 +1,12 @@
 package com.ruchij.web.routes;
 
 import com.ruchij.service.health.HealthService;
+import com.ruchij.service.health.models.HealthCheck;
 import com.ruchij.service.health.models.ServiceInformation;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class ServiceRoute implements EndpointGroup {
     private final HealthService healthService;
@@ -17,11 +17,17 @@ public class ServiceRoute implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
-        path("/info", () ->
-                get(context -> {
-                    ServiceInformation serviceInformation = healthService.serviceInformation();
-                    context.status(HttpStatus.OK).json(serviceInformation);
-                })
-        );
+        get("/info", context -> {
+            ServiceInformation serviceInformation = healthService.serviceInformation();
+            context.status(HttpStatus.OK).json(serviceInformation);
+        });
+
+        get("/health", context -> {
+            HealthCheck healthCheck = healthService.healthCheck();
+
+            context
+                .status(healthCheck.isHealthy() ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE)
+                .json(healthCheck);
+        });
     }
 }

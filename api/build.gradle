@@ -30,7 +30,10 @@ dependencies {
             platform("org.junit:junit-bom:$junitVersion"),
             'org.junit.jupiter:junit-jupiter',
             'org.junit.platform:junit-platform-launcher',
-            "org.mockito:mockito-core:$mockitoVersion"
+            "org.mockito:mockito-core:$mockitoVersion",
+            "org.testcontainers:testcontainers:$testcontainersVersion",
+            "org.testcontainers:junit-jupiter:$testcontainersVersion",
+            "org.testcontainers:mongodb:$testcontainersVersion"
     )
 }
 

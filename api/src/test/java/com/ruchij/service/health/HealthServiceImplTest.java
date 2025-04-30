@@ -6,10 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import com.ruchij.service.health.models.BuildInformation;
 import com.ruchij.service.health.models.HealthCheck;
 import com.ruchij.service.health.models.ServiceInformation;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,10 +28,10 @@ class HealthServiceImplTest {
     private static final String DATABASE_NAME = "test-db";
 
     @Container
-    private static final MongoDBContainer mongoDBContainer = 
+    private static final MongoDBContainer mongoDBContainer =
         new MongoDBContainer(DockerImageName.parse("mongo:8.0"));
 
-    private static MongoClient mongoClient;
+    private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
     private ExecutorService executorService;
     private Properties properties;
@@ -44,19 +41,16 @@ class HealthServiceImplTest {
     @BeforeAll
     static void beforeAll() {
         mongoDBContainer.start();
-        mongoClient = MongoClients.create(mongoDBContainer.getConnectionString());
     }
 
     @AfterAll
     static void afterAll() {
-        if (mongoClient != null) {
-            mongoClient.close();
-        }
         mongoDBContainer.stop();
     }
 
     @BeforeEach
     void setUp() {
+        mongoClient = MongoClients.create(mongoDBContainer.getConnectionString());
         mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
         
         executorService = Executors.newVirtualThreadPerTaskExecutor();
@@ -81,6 +75,12 @@ class HealthServiceImplTest {
             properties,
             buildInformation
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        mongoClient.close();
+        executorService.shutdownNow();
     }
 
     @Test

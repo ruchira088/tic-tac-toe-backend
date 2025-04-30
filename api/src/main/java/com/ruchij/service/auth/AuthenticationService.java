@@ -11,4 +11,6 @@ public interface AuthenticationService {
     AuthToken createAuthToken(String userId) throws ResourceNotFoundException;
 
     User authenticate(String token) throws AuthenticationException;
+
+    User removeAuthToken(String token) throws AuthenticationException;
 }

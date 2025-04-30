@@ -1,7 +1,9 @@
 package com.ruchij.web.routes;
 
 import com.ruchij.dao.auth.models.AuthToken;
+import com.ruchij.dao.user.models.User;
 import com.ruchij.service.auth.AuthenticationService;
+import com.ruchij.web.middleware.Authenticator;
 import com.ruchij.web.requests.UserLoginRequest;
 import io.javalin.apibuilder.EndpointGroup;
 
@@ -19,13 +21,17 @@ public class AuthRoute implements EndpointGroup {
     public void addEndpoints() {
         post(context -> {
             UserLoginRequest userLoginRequest = context.bodyAsClass(UserLoginRequest.class);
-            AuthToken authToken = this.authenticationService.createAuthToken(userLoginRequest.username(), userLoginRequest.password());
+            AuthToken authToken =
+                this.authenticationService.createAuthToken(userLoginRequest.username(), userLoginRequest.password());
 
             context.status(201).json(authToken);
         });
 
-        delete("/token/{token}", context -> {
-            String token = context.pathParam("token");
+        delete(context -> {
+            String authToken = Authenticator.getToken(context);
+            User user = this.authenticationService.removeAuthToken(authToken);
+
+            context.status(200).json(user);
         });
     }
 }

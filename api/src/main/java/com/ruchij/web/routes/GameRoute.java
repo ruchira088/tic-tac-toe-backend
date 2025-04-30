@@ -65,7 +65,7 @@ public class GameRoute implements EndpointGroup {
             ws("/updates", ws -> {
                 ws.onConnect(wsConnectContext -> {
                     wsConnectContext.enableAutomaticPings();
-                    User user = this.authenticator.authenticate(wsConnectContext.headerMap());
+                    User user = this.authenticator.authenticate(wsConnectContext);
                     String gameId = wsConnectContext.pathParam("gameId");
 
                     String registrationId =

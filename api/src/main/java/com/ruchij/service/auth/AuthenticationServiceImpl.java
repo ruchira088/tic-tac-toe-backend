@@ -79,4 +79,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return user;
     }
+
+    @Override
+    public User removeAuthToken(String token) throws AuthenticationException {
+        User user = this.authenticate(token);
+        this.authTokenDao.deleteByToken(token);
+
+        return user;
+    }
 }

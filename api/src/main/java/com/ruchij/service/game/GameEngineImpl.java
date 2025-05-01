@@ -65,7 +65,8 @@ public class GameEngineImpl implements GameEngine {
         Optional<Game.Winner> winner = movesByPlayer.entrySet().stream()
             .filter(entry -> entry.getValue().size() >= gridSize)
             .flatMap(entry -> {
-                List<Game.Coordinate> coordinates = entry.getValue().stream().map(Game.Move::coordinate).toList();
+                Set<Game.Coordinate> coordinates =
+                    entry.getValue().stream().map(Game.Move::coordinate).collect(Collectors.toSet());
 
                 return isWinner(coordinates)
                     .map(winningRule -> new Game.Winner(entry.getKey(), winningRule))
@@ -76,45 +77,42 @@ public class GameEngineImpl implements GameEngine {
         return winner;
     }
 
-    Optional<Game.WinningRule> isWinner(List<Game.Coordinate> coordinates) {
+    Optional<Game.WinningRule> isWinner(Set<Game.Coordinate> coordinates) {
         if (coordinates.size() >= gridSize) {
-            HashSet<Game.Coordinate> coordinateHashSet = new HashSet<>(coordinates);
+            for (Game.Coordinate baseCoordinate : coordinates) {
+                boolean isHorizontalWin =
+                    coordinates.stream()
+                        .filter(coordinate -> coordinate.y() == baseCoordinate.y())
+                        .count() == gridSize;
 
-            if (coordinateHashSet.size() != coordinates.size()) {
-                return Optional.empty();
+                if (isHorizontalWin) {
+                    return Optional.of(Game.WinningRule.Horizontal);
+                }
+
+                boolean isVerticalWin =
+                    coordinates.stream()
+                        .filter(coordinate -> coordinate.x() == baseCoordinate.x())
+                        .count() == gridSize;
+
+                if (isVerticalWin) {
+                    return Optional.of(Game.WinningRule.Vertical);
+                }
+
+                HashSet<Game.Coordinate> rightDiagonal = new HashSet<>();
+                HashSet<Game.Coordinate> leftDiagonal = new HashSet<>();
+
+                for (int i = 0; i < gridSize; i++) {
+                    leftDiagonal.add(new Game.Coordinate(i, i));
+                    rightDiagonal.add(new Game.Coordinate(gridSize - 1 - i, i));
+                }
+
+                boolean isRightDiagonalWin = coordinates.containsAll(rightDiagonal);
+                boolean isLeftDiagonalWin = coordinates.containsAll(leftDiagonal);
+
+                if (isRightDiagonalWin || isLeftDiagonalWin) {
+                    return Optional.of(Game.WinningRule.Diagonal);
+                }
             }
-
-            Game.Coordinate baseCoordinate = coordinates.getFirst();
-
-            boolean isHorizontalWin =
-                coordinates.stream().allMatch(coordinate -> coordinate.y() == baseCoordinate.y());
-
-            if (isHorizontalWin) {
-                return Optional.of(Game.WinningRule.Horizontal);
-            }
-
-            boolean isVerticalWin =
-                coordinates.stream().allMatch(coordinate -> coordinate.x() == baseCoordinate.x());
-
-            if (isVerticalWin) {
-                return Optional.of(Game.WinningRule.Vertical);
-            }
-
-            HashSet<Game.Coordinate> rightDiagonal = new HashSet<>();
-            HashSet<Game.Coordinate> leftDiagonal = new HashSet<>();
-
-            for (int i = 0; i < gridSize; i++) {
-                leftDiagonal.add(new Game.Coordinate(i, i));
-                rightDiagonal.add(new Game.Coordinate(gridSize - 1 - i, i));
-            }
-
-            boolean isRightDiagonalWin = rightDiagonal.containsAll(coordinates);
-            boolean isLeftDiagonalWin = leftDiagonal.containsAll(coordinates);
-
-            if (isRightDiagonalWin || isLeftDiagonalWin) {
-                return Optional.of(Game.WinningRule.Diagonal);
-            }
-
         }
 
         return Optional.empty();

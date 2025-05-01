@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 class GameEngineImplTest {
     private static final GameEngineImpl gameEngineImpl = new GameEngineImpl();
@@ -18,11 +19,11 @@ class GameEngineImplTest {
             * * *
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(0, 0),
-                        new Game.Coordinate(1, 0),
-                        new Game.Coordinate(2, 0)
-                )
+            Set.of(
+                new Game.Coordinate(0, 0),
+                new Game.Coordinate(1, 0),
+                new Game.Coordinate(2, 0)
+            )
         ));
 
         /*
@@ -31,11 +32,11 @@ class GameEngineImplTest {
             * * *
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(0, 1),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(2, 1)
-                )
+            Set.of(
+                new Game.Coordinate(0, 1),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(2, 1)
+            )
         ));
 
         /*
@@ -44,11 +45,26 @@ class GameEngineImplTest {
             X X X
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(0, 2),
-                        new Game.Coordinate(1, 2),
-                        new Game.Coordinate(2, 2)
-                )
+            Set.of(
+                new Game.Coordinate(0, 2),
+                new Game.Coordinate(1, 2),
+                new Game.Coordinate(2, 2)
+            )
+        ));
+
+        /*
+            * * *
+            X X *
+            X X X
+         */
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Horizontal), gameEngineImpl.isWinner(
+            Set.of(
+                new Game.Coordinate(0, 1),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 2),
+                new Game.Coordinate(1, 2),
+                new Game.Coordinate(2, 2)
+            )
         ));
     }
 
@@ -60,11 +76,11 @@ class GameEngineImplTest {
             X * *
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(0, 0),
-                        new Game.Coordinate(0, 1),
-                        new Game.Coordinate(0, 2)
-                )
+            Set.of(
+                new Game.Coordinate(0, 0),
+                new Game.Coordinate(0, 1),
+                new Game.Coordinate(0, 2)
+            )
         ));
 
          /*
@@ -73,11 +89,11 @@ class GameEngineImplTest {
             * X *
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(1, 0),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(1, 2)
-                )
+            Set.of(
+                new Game.Coordinate(1, 0),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(1, 2)
+            )
         ));
 
         /*
@@ -86,11 +102,26 @@ class GameEngineImplTest {
             * * X
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(2, 0),
-                        new Game.Coordinate(2, 1),
-                        new Game.Coordinate(2, 2)
-                )
+            Set.of(
+                new Game.Coordinate(2, 0),
+                new Game.Coordinate(2, 1),
+                new Game.Coordinate(2, 2)
+            )
+        ));
+
+        /*
+         * * X
+         * X X
+         * X X
+         */
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
+            Set.of(
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(1, 2),
+                new Game.Coordinate(2, 0),
+                new Game.Coordinate(2, 1),
+                new Game.Coordinate(2, 2)
+            )
         ));
     }
 
@@ -102,11 +133,26 @@ class GameEngineImplTest {
              X * *
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Diagonal), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(2, 0),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(0, 2)
-                )
+            Set.of(
+                new Game.Coordinate(2, 0),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 2)
+            )
+        ));
+
+        /*
+             * X X
+             * X X
+             X * *
+         */
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Diagonal), gameEngineImpl.isWinner(
+            Set.of(
+                new Game.Coordinate(1, 0),
+                new Game.Coordinate(2, 1),
+                new Game.Coordinate(2, 0),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 2)
+            )
         ));
     }
 
@@ -118,11 +164,26 @@ class GameEngineImplTest {
              * * X
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Diagonal), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(2, 2),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(0, 0)
-                )
+            Set.of(
+                new Game.Coordinate(2, 2),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 0)
+            )
+        ));
+
+        /*
+             X * *
+             X X *
+             * X X
+         */
+        Assertions.assertEquals(Optional.of(Game.WinningRule.Diagonal), gameEngineImpl.isWinner(
+            Set.of(
+                new Game.Coordinate(0, 1),
+                new Game.Coordinate(1, 2),
+                new Game.Coordinate(2, 2),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 0)
+            )
         ));
     }
 
@@ -134,11 +195,11 @@ class GameEngineImplTest {
              * X *
          */
         Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(1, 2),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(0, 0)
-                )
+            Set.of(
+                new Game.Coordinate(1, 2),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 0)
+            )
         ));
 
         /*
@@ -147,11 +208,10 @@ class GameEngineImplTest {
              * * *
          */
         Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(0, 0)
-                )
+            Set.of(
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(0, 0)
+            )
         ));
 
         /*
@@ -160,11 +220,11 @@ class GameEngineImplTest {
              * * X
          */
         Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(1, 0),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(2, 2)
-                )
+            Set.of(
+                new Game.Coordinate(1, 0),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(2, 2)
+            )
         ));
 
         /*
@@ -173,11 +233,11 @@ class GameEngineImplTest {
              * * X
          */
         Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
-                List.of(
-                        new Game.Coordinate(2, 0),
-                        new Game.Coordinate(1, 1),
-                        new Game.Coordinate(2, 2)
-                )
+            Set.of(
+                new Game.Coordinate(2, 0),
+                new Game.Coordinate(1, 1),
+                new Game.Coordinate(2, 2)
+            )
         ));
     }
 }

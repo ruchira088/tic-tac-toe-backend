@@ -28,18 +28,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(Optional<String> username, Optional<String> password) {
-        String userId = this.randomGenerator.uuid().toString();
+    public User registerUser() {
+        return this.registerUser(
+            this.randomGenerator.username(),
+            this.randomGenerator.password(),
+            Optional.empty()
+        );
+    }
 
+    @Override
+    public User registerUser(String username, String password, String email) {
+        return this.registerUser(username, password, Optional.of(email));
+    }
+
+    private User registerUser(String username, String password, Optional<String> email) {
         User user = new User(
-            userId,
-            username.orElseGet(this.randomGenerator::username),
+            this.randomGenerator.uuid().toString(),
+            username,
+            email,
             this.clock.instant()
         );
 
-        String userPassword = password.orElseGet(this.randomGenerator::password);
-        String hashedPassword = this.passwordHashingService.hashPassword(userPassword);
-        UserCredentials userCredentials = new UserCredentials(userId, hashedPassword);
+        String hashedPassword = this.passwordHashingService.hashPassword(password);
+        UserCredentials userCredentials = new UserCredentials(user.id(), hashedPassword);
 
         this.userDao.insert(user);
         this.userDao.insert(userCredentials);

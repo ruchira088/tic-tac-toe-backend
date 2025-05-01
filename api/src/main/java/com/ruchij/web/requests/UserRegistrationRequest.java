@@ -3,7 +3,8 @@ package com.ruchij.web.requests;
 import java.util.Optional;
 
 public record UserRegistrationRequest(
-    Optional<String> username,
-    Optional<String> password
+    String username,
+    String password,
+    String email
 ) {
 }

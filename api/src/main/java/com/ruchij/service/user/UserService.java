@@ -4,10 +4,10 @@ package com.ruchij.service.user;
 import com.ruchij.dao.user.models.User;
 import com.ruchij.exception.ResourceNotFoundException;
 
-import java.util.Optional;
-
 public interface UserService {
-    User registerUser(Optional<String> username, Optional<String> password);
+    User registerUser();
+
+    User registerUser(String username, String password, String email);
 
     User getUserById(String userId) throws ResourceNotFoundException;
 }

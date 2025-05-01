@@ -11,6 +11,10 @@ public class GameEngineImpl implements GameEngine {
     private final int gridSize;
 
     public GameEngineImpl(int gridSize) {
+        if (gridSize < 1) {
+            throw new IllegalArgumentException("gridSize must be greater than 0");
+        }
+
         this.gridSize = gridSize;
     }
 

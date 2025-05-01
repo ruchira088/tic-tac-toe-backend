@@ -94,11 +94,6 @@ public class GameServiceImpl implements GameService {
         return game;
     }
 
-    private Game getGameById(String gameId) throws ResourceNotFoundException {
-        return this.gameDao.findGameById(gameId)
-            .orElseThrow(() -> new ResourceNotFoundException("Unable to find game with id=%s".formatted(gameId)));
-    }
-
     @Override
     public Game addMove(String gameId, String playerId, Game.Coordinate coordinate)
         throws ResourceNotFoundException, ValidationException {
@@ -148,7 +143,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game findGameById(String gameId) throws ResourceNotFoundException {
+    public Game getGameById(String gameId) throws ResourceNotFoundException {
         Game game = this.gameDao.findGameById(gameId)
             .orElseThrow(() -> new ResourceNotFoundException("Game with gameId=%s not found".formatted(gameId)));
 
@@ -156,7 +151,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public PendingGame findPendingGameById(String pendingGameId) throws ResourceNotFoundException {
+    public PendingGame getPendingGameById(String pendingGameId) throws ResourceNotFoundException {
         PendingGame pendingGame = this.gameDao.findPendingGameById(pendingGameId)
             .orElseThrow(() -> new ResourceNotFoundException("Error finding pending game with pendingGameId=%s".formatted(pendingGameId)));
 

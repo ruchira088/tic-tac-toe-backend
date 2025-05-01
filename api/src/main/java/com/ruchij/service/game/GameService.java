@@ -21,9 +21,9 @@ public interface GameService {
         Game.Coordinate coordinate
     ) throws ResourceNotFoundException, ValidationException;
 
-    Game findGameById(String gameId) throws ResourceNotFoundException;
+    Game getGameById(String gameId) throws ResourceNotFoundException;
 
-    PendingGame findPendingGameById(String pendingGameId) throws ResourceNotFoundException;
+    PendingGame getPendingGameById(String pendingGameId) throws ResourceNotFoundException;
 
     String registerForUpdates(
         String gameId,

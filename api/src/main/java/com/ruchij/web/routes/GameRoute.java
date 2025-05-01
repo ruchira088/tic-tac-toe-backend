@@ -51,7 +51,7 @@ public class GameRoute implements EndpointGroup {
             path("/id/{gameId}", () -> {
                 get(context -> {
                     String gameId = context.pathParam("gameId");
-                    PendingGame pendingGame = this.gameService.findPendingGameById(gameId);
+                    PendingGame pendingGame = this.gameService.getPendingGameById(gameId);
                     context.status(HttpStatus.OK).json(pendingGame);
                 });
 
@@ -69,7 +69,7 @@ public class GameRoute implements EndpointGroup {
         path("/id/{gameId}", () -> {
             get(context -> {
                 String gameId = context.pathParam("gameId");
-                Game game = this.gameService.findGameById(gameId);
+                Game game = this.gameService.getGameById(gameId);
                 context.status(HttpStatus.OK).json(game);
             });
 

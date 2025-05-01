@@ -23,7 +23,7 @@ public class RandomGeneratorImpl implements RandomGenerator {
 
         String username = "%s.%s".formatted(color, animal).replaceAll(" ", ".");
 
-        Optional<User> user = userDao.findByName(username);
+        Optional<User> user = userDao.findByUsername(username);
 
         if (user.isPresent()) {
             return username();

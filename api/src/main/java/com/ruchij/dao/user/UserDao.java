@@ -15,7 +15,7 @@ public interface UserDao {
 
     Optional<User> findById(String userId);
 
-    Optional<User> findByName(String name);
+    Optional<User> findByUsername(String username);
 
-    List<User> searchByName(String name);
+    List<User> searchByUsername(String username);
 }

@@ -6,24 +6,36 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 import com.ruchij.dao.user.models.User;
 import com.ruchij.dao.user.models.UserCredentials;
+import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class MongoUserDaoImpl implements UserDao {
-    private final MongoCollection<User> userCollection;
+    public record MongoUser(@BsonId String id, String username, String email, Instant createdAt) {
+        public User toUser() {
+            return new User(this.id, this.username, Optional.ofNullable(this.email), this.createdAt);
+        }
+
+        private static MongoUser fromUser(User user) {
+            return new MongoUser(user.id(), user.username(), user.email().orElse(null), user.createdAt());
+        }
+    }
+
+    private final MongoCollection<MongoUser> userCollection;
     private final MongoCollection<UserCredentials> userCredentialsCollection;
 
     public MongoUserDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
-        this.userCollection = mongoDatabase.getCollection("users-%s".formatted(collectionNameSuffix), User.class);
+        this.userCollection = mongoDatabase.getCollection("users-%s".formatted(collectionNameSuffix), MongoUser.class);
         this.userCredentialsCollection = mongoDatabase.getCollection("user_credentials", UserCredentials.class);
     }
 
     @Override
     public User insert(User user) {
-        InsertOneResult insertOneResult = this.userCollection.insertOne(user);
+        InsertOneResult insertOneResult = this.userCollection.insertOne(MongoUser.fromUser(user));
 
         return user;
     }
@@ -42,18 +54,21 @@ public class MongoUserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findById(String userId) {
-        return Optional.ofNullable(this.userCollection.find(Filters.eq("_id", userId)).first());
+        return Optional.ofNullable(this.userCollection.find(Filters.eq("_id", userId)).first())
+            .map(MongoUser::toUser);
     }
 
     @Override
-    public Optional<User> findByName(String name) {
-        return Optional.ofNullable(this.userCollection.find(Filters.eq("name", name)).first());
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(this.userCollection.find(Filters.eq("username", username)).first())
+            .map(MongoUser::toUser);
     }
 
     @Override
-    public List<User> searchByName(String name) {
+    public List<User> searchByUsername(String username) {
         return this.userCollection
-                .find(Filters.regex("name", Pattern.compile(name)))
+                .find(Filters.regex("username", Pattern.compile(username)))
+                .map(MongoUser::toUser)
                 .into(new ArrayList<>());
     }
 }

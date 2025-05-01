@@ -36,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthToken createAuthToken(String username, String password) throws ResourceNotFoundException, AuthenticationException {
-        User user = this.userDao.findByName(username)
+        User user = this.userDao.findByUsername(username)
             .orElseThrow(() -> new ResourceNotFoundException("Unable to find user with username=%s".formatted(username)));
 
         UserCredentials userCredentials = this.userDao.findCredentialsById(user.id())

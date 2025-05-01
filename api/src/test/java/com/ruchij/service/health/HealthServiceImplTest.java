@@ -28,8 +28,8 @@ class HealthServiceImplTest {
     private static final String DATABASE_NAME = "test-db";
 
     @Container
-    private static final MongoDBContainer mongoDBContainer =
-        new MongoDBContainer(DockerImageName.parse("mongo:8.0"));
+    private static final MongoDBContainer MONGO_DB_CONTAINER =
+        new MongoDBContainer("mongo:8");
 
     private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
@@ -40,17 +40,17 @@ class HealthServiceImplTest {
 
     @BeforeAll
     static void beforeAll() {
-        mongoDBContainer.start();
+        MONGO_DB_CONTAINER.start();
     }
 
     @AfterAll
     static void afterAll() {
-        mongoDBContainer.stop();
+        MONGO_DB_CONTAINER.stop();
     }
 
     @BeforeEach
     void setUp() {
-        mongoClient = MongoClients.create(mongoDBContainer.getConnectionString());
+        mongoClient = MongoClients.create(MONGO_DB_CONTAINER.getConnectionString());
         mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
         
         executorService = Executors.newVirtualThreadPerTaskExecutor();

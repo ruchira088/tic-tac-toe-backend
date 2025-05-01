@@ -23,7 +23,12 @@ public class GameServiceImpl implements GameService {
     private final Map<String, Map<String, Consumer<Game.Winner>>> winnerUpdates = new ConcurrentHashMap<>();
     private final Map<String, String> registrationIdToGameId = new ConcurrentHashMap<>();
 
-    public GameServiceImpl(GameDao gameDao, GameEngine gameEngine, Clock clock, RandomGenerator randomGenerator) {
+    public GameServiceImpl(
+        GameDao gameDao,
+        GameEngine gameEngine,
+        Clock clock,
+        RandomGenerator randomGenerator
+    ) {
         this.gameDao = gameDao;
         this.gameEngine = gameEngine;
         this.clock = clock;

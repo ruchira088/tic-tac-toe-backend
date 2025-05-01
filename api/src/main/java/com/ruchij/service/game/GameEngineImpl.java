@@ -7,7 +7,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameEngineImpl implements GameEngine {
-    private static final int GRID_SIZE = 3;
+    private static final int DEFAULT_GRID_SIZE = 3;
+    private final int gridSize;
+
+    public GameEngineImpl(int gridSize) {
+        this.gridSize = gridSize;
+    }
+
+    public GameEngineImpl() {
+        this(DEFAULT_GRID_SIZE);
+    }
 
     @Override
     public void checkMove(Game game, String playerId, Game.Coordinate coordinate) throws ValidationException {
@@ -20,7 +29,7 @@ public class GameEngineImpl implements GameEngine {
         }
 
         boolean isVacant = game.moves().stream()
-                .skip(Math.max(0, game.moves().size() - GRID_SIZE * 2))
+                .skip(Math.max(0, game.moves().size() - gridSize * 2))
                 .noneMatch(move -> move.coordinate().equals(coordinate));
 
         if (!isVacant) {
@@ -38,19 +47,19 @@ public class GameEngineImpl implements GameEngine {
             );
         }
 
-        if (coordinate.x() < 0 || coordinate.x() >= GRID_SIZE || coordinate.y() < 0 || coordinate.y() >= GRID_SIZE) {
+        if (coordinate.x() < 0 || coordinate.x() >= gridSize || coordinate.y() < 0 || coordinate.y() >= gridSize) {
             throw new ValidationException("Coordinate x=%s, y=%s is out of bounds".formatted(coordinate.x(), coordinate.y()));
         }
     }
 
     @Override
     public Optional<Game.Winner> getWinner(Game game) {
-        if (game.moves().size() < GRID_SIZE * 2 - 1) {
+        if (game.moves().size() < gridSize * 2 - 1) {
             return Optional.empty();
         }
 
         Map<String, List<Game.Move>> movesByPlayer = game.moves().stream()
-                .skip(game.moves().size() - GRID_SIZE * 2)
+                .skip(Math.max(0, game.moves().size() - gridSize * 2))
                 .collect(Collectors.groupingBy(move -> move.playerId()));
 
         Optional<Game.Winner> winner = movesByPlayer.entrySet().stream()
@@ -67,7 +76,7 @@ public class GameEngineImpl implements GameEngine {
     }
 
     Optional<Game.WinningRule> isWinner(List<Game.Coordinate> coordinates) {
-        if (coordinates.size() >= GRID_SIZE) {
+        if (coordinates.size() >= gridSize) {
             HashSet<Game.Coordinate> coordinateHashSet = new HashSet<>(coordinates);
 
             if (coordinateHashSet.size() != coordinates.size()) {
@@ -93,9 +102,9 @@ public class GameEngineImpl implements GameEngine {
             HashSet<Game.Coordinate> rightDiagonal = new HashSet<>();
             HashSet<Game.Coordinate> leftDiagonal = new HashSet<>();
 
-            for (int i = 0; i < GRID_SIZE; i++) {
+            for (int i = 0; i < gridSize; i++) {
                 leftDiagonal.add(new Game.Coordinate(i, i));
-                rightDiagonal.add(new Game.Coordinate(GRID_SIZE - 1 - i, i));
+                rightDiagonal.add(new Game.Coordinate(gridSize - 1 - i, i));
             }
 
             boolean isRightDiagonalWin = rightDiagonal.containsAll(coordinates);

@@ -56,6 +56,7 @@ class MongoUserDaoImplTest {
         Assertions.assertEquals(id, result.id());
         Assertions.assertEquals(username, result.username());
         Assertions.assertEquals(Optional.of(email), result.email());
+        Assertions.assertEquals(createdAt.getEpochSecond(), result.createdAt().getEpochSecond());
     }
 
     @Test
@@ -87,6 +88,7 @@ class MongoUserDaoImplTest {
         Assertions.assertEquals(id, result.id());
         Assertions.assertEquals(username, result.username());
         Assertions.assertEquals(Optional.of(email), result.email());
+        Assertions.assertEquals(createdAt.getEpochSecond(), result.createdAt().getEpochSecond());
     }
 
     @Test

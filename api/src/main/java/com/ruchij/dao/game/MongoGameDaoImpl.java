@@ -7,31 +7,103 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.dao.game.models.PendingGame;
+import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MongoGameDaoImpl implements GameDao {
-    private final MongoCollection<PendingGame> pendingGamesCollection;
-    private final MongoCollection<Game> gamesCollection;
+    public record MongoGame(
+            @BsonId String id,
+            String name,
+            Instant createdAt,
+            String createdBy,
+            Instant startedAt,
+            String playerOneId,
+            String playerTwoId,
+            List<Game.Move> moves,
+            Game.Winner winner
+    ) {
+        public Game toGame() {
+            return new Game(
+                    id,
+                    name,
+                    createdAt,
+                    createdBy,
+                    startedAt,
+                    playerOneId,
+                    playerTwoId,
+                    moves,
+                    Optional.ofNullable(winner)
+            );
+        }
+
+        public static MongoGame fromGame(Game game) {
+            return new MongoGame(
+                    game.id(),
+                    game.name(),
+                    game.createdAt(),
+                    game.createdBy(),
+                    game.startedAt(),
+                    game.playerOneId(),
+                    game.playerTwoId(),
+                    game.moves(),
+                    game.winner().orElse(null)
+            );
+        }
+    }
+
+    public record MongoPendingGame(
+            @BsonId String id,
+            String name,
+            Instant createdAt,
+            String createdBy,
+            Instant gameStartedAt
+    ) {
+        public PendingGame toPendingGame() {
+            return new PendingGame(
+                    id,
+                    name,
+                    createdAt,
+                    createdBy,
+                    Optional.ofNullable(gameStartedAt)
+            );
+        }
+
+        public static MongoPendingGame fromPendingGame(PendingGame pendingGame) {
+            return new MongoPendingGame(
+                    pendingGame.id(),
+                    pendingGame.name(),
+                    pendingGame.createdAt(),
+                    pendingGame.createdBy(),
+                    pendingGame.gameStartedAt().orElse(null)
+            );
+        }
+    }
+
+    private final MongoCollection<MongoPendingGame> pendingGamesCollection;
+    private final MongoCollection<MongoGame> gamesCollection;
 
     public MongoGameDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
-        this.pendingGamesCollection = mongoDatabase.getCollection("pending_games-%s".formatted(collectionNameSuffix), PendingGame.class);
-        this.gamesCollection = mongoDatabase.getCollection("games", Game.class);
+        this.pendingGamesCollection = mongoDatabase.getCollection("pending_games-%s".formatted(collectionNameSuffix), MongoPendingGame.class);
+        this.gamesCollection = mongoDatabase.getCollection("games", MongoGame.class);
     }
 
     @Override
     public PendingGame insertPendingGame(PendingGame pendingGame) {
-        InsertOneResult insertOneResult = this.pendingGamesCollection.insertOne(pendingGame);
+        MongoPendingGame mongoPendingGame = MongoPendingGame.fromPendingGame(pendingGame);
+        InsertOneResult insertOneResult = this.pendingGamesCollection.insertOne(mongoPendingGame);
 
         return pendingGame;
     }
 
     @Override
     public Optional<PendingGame> updatePendingGame(PendingGame pendingGame) {
+        MongoPendingGame mongoPendingGame = MongoPendingGame.fromPendingGame(pendingGame);
         UpdateResult updateResult =
-            this.pendingGamesCollection.replaceOne(Filters.eq("_id", pendingGame.id()), pendingGame);
+            this.pendingGamesCollection.replaceOne(Filters.eq("_id", pendingGame.id()), mongoPendingGame);
 
         if (updateResult.getModifiedCount() > 0) {
             return Optional.of(pendingGame);
@@ -42,30 +114,32 @@ public class MongoGameDaoImpl implements GameDao {
 
     @Override
     public Optional<PendingGame> findPendingGameById(String pendingGameId) {
-        Optional<PendingGame> pendingGame = Optional.ofNullable(
+        return Optional.ofNullable(
             this.pendingGamesCollection
                 .find(Filters.eq("_id", pendingGameId))
                 .first()
-        );
-
-        return pendingGame;
+        ).map(MongoPendingGame::toPendingGame);
     }
 
     @Override
     public Game insertGame(Game game) {
-        InsertOneResult insertOneResult = this.gamesCollection.insertOne(game);
+        InsertOneResult insertOneResult = this.gamesCollection.insertOne(MongoGame.fromGame(game));
 
         return game;
     }
 
     @Override
     public Optional<Game> findGameById(String gameId) {
-        return Optional.ofNullable(this.gamesCollection.find(Filters.eq("_id", gameId)).first());
+        return Optional.ofNullable(this.gamesCollection.find(Filters.eq("_id", gameId)).first())
+            .map(MongoGame::toGame);
     }
 
     @Override
     public Optional<Game> updateGame(Game game) {
-        UpdateResult updateResult = this.gamesCollection.replaceOne(Filters.eq("_id", game.id()), game);
+        UpdateResult updateResult = this.gamesCollection.replaceOne(
+            Filters.eq("_id", game.id()), 
+            MongoGame.fromGame(game)
+        );
 
         if (updateResult.getModifiedCount() > 0) {
             return Optional.of(game);
@@ -76,6 +150,7 @@ public class MongoGameDaoImpl implements GameDao {
 
     @Override
     public List<PendingGame> getPendingGames(int limit, int offset) {
-        return this.pendingGamesCollection.find().skip(offset).limit(limit).into(new ArrayList<>());
+        List<MongoPendingGame> mongoPendingGames = this.pendingGamesCollection.find().skip(offset).limit(limit).into(new ArrayList<>());
+        return mongoPendingGames.stream().map(MongoPendingGame::toPendingGame).toList();
     }
 }

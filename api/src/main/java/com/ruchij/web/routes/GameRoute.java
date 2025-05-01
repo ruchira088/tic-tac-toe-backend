@@ -91,7 +91,6 @@ public class GameRoute implements EndpointGroup {
                     String registrationId =
                         this.gameService.registerForUpdates(
                             gameId,
-                            user.id(),
                             move -> {
                                 wsConnectContext.send(new WebSocketResponse<>(WebSocketResponse.Type.MOVE_UPDATE, move));
                             },

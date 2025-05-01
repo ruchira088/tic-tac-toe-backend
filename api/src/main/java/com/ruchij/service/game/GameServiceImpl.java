@@ -166,7 +166,6 @@ public class GameServiceImpl implements GameService {
     @Override
     public String registerForUpdates(
         String gameId,
-        String playerId,
         Consumer<Game.Move> moveUpdates,
         Consumer<Game.Winner> winnerUpdates
     ) throws ResourceNotFoundException {
@@ -177,11 +176,11 @@ public class GameServiceImpl implements GameService {
 
         this.registrationIdToGameId.put(registrationId, gameId);
 
-        this.moveUpdates.computeIfAbsent(registrationId, __ -> new ConcurrentHashMap<>())
-            .put(playerId, moveUpdates);
+        this.moveUpdates.computeIfAbsent(gameId, __ -> new ConcurrentHashMap<>())
+            .put(registrationId, moveUpdates);
 
-        this.winnerUpdates.computeIfAbsent(registrationId, __ -> new ConcurrentHashMap<>())
-            .put(playerId, winnerUpdates);
+        this.winnerUpdates.computeIfAbsent(gameId, __ -> new ConcurrentHashMap<>())
+            .put(registrationId, winnerUpdates);
 
         return registrationId;
     }

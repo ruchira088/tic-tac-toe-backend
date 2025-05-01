@@ -27,7 +27,6 @@ public interface GameService {
 
     String registerForUpdates(
         String gameId,
-        String playerId,
         Consumer<Game.Move> moveUpdates,
         Consumer<Game.Winner> winnerUpdates
     ) throws ResourceNotFoundException;

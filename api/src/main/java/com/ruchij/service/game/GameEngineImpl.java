@@ -33,8 +33,8 @@ public class GameEngineImpl implements GameEngine {
         }
 
         boolean isVacant = game.moves().stream()
-                .skip(Math.max(0, game.moves().size() - gridSize * 2))
-                .noneMatch(move -> move.coordinate().equals(coordinate));
+            .skip(Math.max(0, game.moves().size() - gridSize * 2))
+            .noneMatch(move -> move.coordinate().equals(coordinate));
 
         if (!isVacant) {
             throw new ValidationException("%s is NOT vacant".formatted(coordinate));
@@ -46,8 +46,8 @@ public class GameEngineImpl implements GameEngine {
 
         if (!isPlayerTurn) {
             throw new ValidationException(
-                    "It is NOT the current turn for playerId=%s in gameId=%s"
-                            .formatted(playerId, game.moves())
+                "It is NOT the current turn for playerId=%s in gameId=%s"
+                    .formatted(playerId, game.moves())
             );
         }
 
@@ -58,23 +58,20 @@ public class GameEngineImpl implements GameEngine {
 
     @Override
     public Optional<Game.Winner> getWinner(Game game) {
-        if (game.moves().size() < gridSize * 2 - 1) {
-            return Optional.empty();
-        }
-
         Map<String, List<Game.Move>> movesByPlayer = game.moves().stream()
-                .skip(Math.max(0, game.moves().size() - gridSize * 2))
-                .collect(Collectors.groupingBy(move -> move.playerId()));
+            .skip(Math.max(0, game.moves().size() - gridSize * 2))
+            .collect(Collectors.groupingBy(move -> move.playerId()));
 
         Optional<Game.Winner> winner = movesByPlayer.entrySet().stream()
-                .flatMap(entry -> {
-                    List<Game.Coordinate> coordinates = entry.getValue().stream().map(Game.Move::coordinate).toList();
+            .filter(entry -> entry.getValue().size() >= gridSize)
+            .flatMap(entry -> {
+                List<Game.Coordinate> coordinates = entry.getValue().stream().map(Game.Move::coordinate).toList();
 
-                    return isWinner(coordinates)
-                            .map(winningRule -> new Game.Winner(entry.getKey(), winningRule))
-                            .stream();
-                })
-                .findFirst();
+                return isWinner(coordinates)
+                    .map(winningRule -> new Game.Winner(entry.getKey(), winningRule))
+                    .stream();
+            })
+            .findFirst();
 
         return winner;
     }
@@ -90,14 +87,14 @@ public class GameEngineImpl implements GameEngine {
             Game.Coordinate baseCoordinate = coordinates.getFirst();
 
             boolean isHorizontalWin =
-                    coordinates.stream().allMatch(coordinate -> coordinate.y() == baseCoordinate.y());
+                coordinates.stream().allMatch(coordinate -> coordinate.y() == baseCoordinate.y());
 
             if (isHorizontalWin) {
                 return Optional.of(Game.WinningRule.Horizontal);
             }
 
             boolean isVerticalWin =
-                    coordinates.stream().allMatch(coordinate -> coordinate.x() == baseCoordinate.x());
+                coordinates.stream().allMatch(coordinate -> coordinate.x() == baseCoordinate.x());
 
             if (isVerticalWin) {
                 return Optional.of(Game.WinningRule.Vertical);

@@ -8,7 +8,6 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.ruchij.dao.auth.models.AuthToken;
-import org.bson.Document;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

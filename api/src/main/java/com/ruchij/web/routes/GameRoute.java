@@ -38,7 +38,7 @@ public class GameRoute implements EndpointGroup {
             });
 
             get(context -> {
-                User user = this.authenticator.authenticate(context);
+                this.authenticator.authenticate(context);
 
                 int offset = context.queryParamAsClass("offset", Integer.class).getOrDefault(0);
                 int limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
@@ -50,6 +50,8 @@ public class GameRoute implements EndpointGroup {
 
             path("/id/{gameId}", () -> {
                 get(context -> {
+                    this.authenticator.authenticate(context);
+
                     String gameId = context.pathParam("gameId");
                     PendingGame pendingGame = this.gameService.getPendingGameById(gameId);
                     context.status(HttpStatus.OK).json(pendingGame);
@@ -68,6 +70,8 @@ public class GameRoute implements EndpointGroup {
 
         path("/id/{gameId}", () -> {
             get(context -> {
+                this.authenticator.authenticate(context);
+
                 String gameId = context.pathParam("gameId");
                 Game game = this.gameService.getGameById(gameId);
                 context.status(HttpStatus.OK).json(game);
@@ -84,8 +88,9 @@ public class GameRoute implements EndpointGroup {
 
             ws("/updates", ws -> {
                 ws.onConnect(wsConnectContext -> {
+                    this.authenticator.authenticate(wsConnectContext);
+
                     wsConnectContext.enableAutomaticPings();
-                    User user = this.authenticator.authenticate(wsConnectContext);
                     String gameId = wsConnectContext.pathParam("gameId");
 
                     String registrationId =

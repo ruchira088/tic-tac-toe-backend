@@ -27,6 +27,7 @@ import com.ruchij.service.user.UserService;
 import com.ruchij.service.user.UserServiceImpl;
 import com.ruchij.utils.JsonUtils;
 import com.ruchij.web.Routes;
+import com.ruchij.web.middleware.ExceptionMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.javalin.Javalin;
@@ -46,8 +47,9 @@ public class App {
 
         Routes routes = routes(applicationConfiguration, properties, clock);
 
-        javalin(routes)
-            .start(applicationConfiguration.httpConfiguration().port());
+        Javalin app = javalin(routes);
+        ExceptionMapper.handle(app);
+        app.start(applicationConfiguration.httpConfiguration().port());
     }
 
     public static Javalin javalin(Routes routes) {
@@ -57,11 +59,10 @@ public class App {
 
             javalinConfig.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> {
-                   rule.allowHost("http://localhost:5173", "*.ruchij.com");
-                   rule.allowCredentials = true;
+                    rule.allowHost("http://localhost:5173", "*.ruchij.com");
+                    rule.allowCredentials = true;
                 });
             });
-
             javalinConfig.router.apiBuilder(routes);
         });
     }

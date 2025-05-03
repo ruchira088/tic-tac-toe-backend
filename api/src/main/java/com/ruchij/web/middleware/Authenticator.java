@@ -3,6 +3,7 @@ package com.ruchij.web.middleware;
 import com.ruchij.dao.user.models.User;
 import com.ruchij.exception.AuthenticationException;
 import com.ruchij.service.auth.AuthenticationService;
+import io.javalin.apibuilder.ApiBuilder;
 import io.javalin.http.Context;
 import io.javalin.http.Header;
 import io.javalin.websocket.WsConnectContext;
@@ -16,11 +17,39 @@ public class Authenticator {
         this.authenticationService = authenticationService;
     }
 
-    public User authenticate(Context context) throws Exception {
+    private User authenticate(Context context) throws Exception {
         String token = Authenticator.getToken(context);
         User user = this.authenticationService.authenticate(token);
 
         return user;
+    }
+
+    public void post(AuthUserHandler authUserHandler) {
+        ApiBuilder.post(context -> {
+            User user = this.authenticate(context);
+            authUserHandler.handle(user, context);
+        });
+    }
+
+    public void post(String path, AuthUserHandler authUserHandler) {
+        ApiBuilder.post(path, context -> {
+            User user = this.authenticate(context);
+            authUserHandler.handle(user, context);
+        });
+    }
+
+    public void get(AuthUserHandler authUserHandler) {
+        ApiBuilder.get(context -> {
+            User user = this.authenticate(context);
+            authUserHandler.handle(user, context);
+        });
+    }
+
+    public void get(String path, AuthUserHandler authUserHandler) {
+        ApiBuilder.get(path, context -> {
+            User user = this.authenticate(context);
+            authUserHandler.handle(user, context);
+        });
     }
 
     public static String getToken(Context context) throws Exception {

@@ -2,7 +2,6 @@ package com.ruchij.web.routes;
 
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.dao.game.models.PendingGame;
-import com.ruchij.dao.user.models.User;
 import com.ruchij.service.auth.AuthenticationService;
 import com.ruchij.service.game.GameService;
 import com.ruchij.web.middleware.Authenticator;
@@ -14,7 +13,8 @@ import io.javalin.http.HttpStatus;
 
 import java.util.List;
 
-import static io.javalin.apibuilder.ApiBuilder.*;
+import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.ws;
 
 public class GameRoute implements EndpointGroup {
     private final GameService gameService;
@@ -28,8 +28,7 @@ public class GameRoute implements EndpointGroup {
     @Override
     public void addEndpoints() {
         path("/pending", () -> {
-            post(context -> {
-                User user = this.authenticator.authenticate(context);
+            this.authenticator.post((user, context) -> {
                 NewGameRequest newGameRequest = context.bodyAsClass(NewGameRequest.class);
 
                 PendingGame pendingGame = this.gameService.createGame(newGameRequest.gameTitle(), user.id());
@@ -37,9 +36,7 @@ public class GameRoute implements EndpointGroup {
                 context.status(HttpStatus.CREATED).json(pendingGame);
             });
 
-            get(context -> {
-                this.authenticator.authenticate(context);
-
+            this.authenticator.get((user, context) -> {
                 int offset = context.queryParamAsClass("offset", Integer.class).getOrDefault(0);
                 int limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
 
@@ -49,16 +46,15 @@ public class GameRoute implements EndpointGroup {
             });
 
             path("/id/{gameId}", () -> {
-                get(context -> {
-                    this.authenticator.authenticate(context);
-
+                this.authenticator.get((user, context) -> {
                     String gameId = context.pathParam("gameId");
+
                     PendingGame pendingGame = this.gameService.getPendingGameById(gameId);
+
                     context.status(HttpStatus.OK).json(pendingGame);
                 });
 
-                post("/join", context -> {
-                    User user = this.authenticator.authenticate(context);
+                this.authenticator.post("/join", (user, context) -> {
                     String gameId = context.pathParam("gameId");
 
                     Game game = this.gameService.startGame(gameId, user.id());
@@ -69,16 +65,15 @@ public class GameRoute implements EndpointGroup {
         });
 
         path("/id/{gameId}", () -> {
-            get(context -> {
-                this.authenticator.authenticate(context);
-
+            this.authenticator.get((user, context) -> {
                 String gameId = context.pathParam("gameId");
+
                 Game game = this.gameService.getGameById(gameId);
+
                 context.status(HttpStatus.OK).json(game);
             });
 
-            post("/move", context -> {
-                User user = this.authenticator.authenticate(context);
+            this.authenticator.post("/move", (user ,context) -> {
                 String gameId = context.pathParam("gameId");
                 Game.Coordinate coordinate = context.bodyAsClass(Game.Coordinate.class);
 

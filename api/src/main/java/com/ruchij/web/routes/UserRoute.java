@@ -10,7 +10,6 @@ import com.ruchij.web.responses.UserRegistrationResponse;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
 
-import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class UserRoute implements EndpointGroup {
@@ -26,7 +25,7 @@ public class UserRoute implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
-        post("/", context -> {
+        post(context -> {
             UserRegistrationRequest userRegistrationRequest = context.bodyAsClass(UserRegistrationRequest.class);
 
             User user = this.userService.registerUser(
@@ -40,8 +39,7 @@ public class UserRoute implements EndpointGroup {
             context.status(HttpStatus.CREATED).json(new UserRegistrationResponse(authToken, user));
         });
 
-        get("/", context -> {
-            User user = this.authenticator.authenticate(context);
+        this.authenticator.get((user, context) -> {
             context.status(HttpStatus.OK).json(user);
         });
 

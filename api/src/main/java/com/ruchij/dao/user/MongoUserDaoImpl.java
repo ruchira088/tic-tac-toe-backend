@@ -30,7 +30,8 @@ public class MongoUserDaoImpl implements UserDao {
 
     public MongoUserDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
         this.userCollection = mongoDatabase.getCollection("users-%s".formatted(collectionNameSuffix), MongoUser.class);
-        this.userCredentialsCollection = mongoDatabase.getCollection("user_credentials", UserCredentials.class);
+        this.userCredentialsCollection =
+            mongoDatabase.getCollection("user_credentials-%s".formatted(collectionNameSuffix), UserCredentials.class);
     }
 
     @Override

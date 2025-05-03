@@ -22,7 +22,7 @@ public class AuthRoute implements EndpointGroup {
         post(context -> {
             UserLoginRequest userLoginRequest = context.bodyAsClass(UserLoginRequest.class);
             AuthToken authToken =
-                this.authenticationService.createAuthToken(userLoginRequest.username(), userLoginRequest.password());
+                this.authenticationService.createAuthToken(userLoginRequest.email(), userLoginRequest.password());
 
             context.status(201).json(authToken);
         });

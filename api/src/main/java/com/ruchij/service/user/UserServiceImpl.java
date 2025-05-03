@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         boolean isExistingEmail = email.flatMap(this.userDao::findByEmail).isPresent();
 
         if (isExistingEmail) {
-            throw new ResourceConflictException("email=% already exists".formatted(email.get()));
+            throw new ResourceConflictException("email=%s already exists".formatted(email.get()));
         }
 
         User user = new User(

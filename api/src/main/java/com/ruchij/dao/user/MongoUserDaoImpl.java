@@ -65,6 +65,12 @@ public class MongoUserDaoImpl implements UserDao {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(this.userCollection.find(Filters.eq("email", email)).first())
+            .map(MongoUser::toUser);
+    }
+
+    @Override
     public List<User> searchByUsername(String username) {
         return this.userCollection
                 .find(Filters.regex("username", Pattern.compile(username)))

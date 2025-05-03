@@ -35,9 +35,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthToken createAuthToken(String username, String password) throws ResourceNotFoundException, AuthenticationException {
-        User user = this.userDao.findByUsername(username)
-            .orElseThrow(() -> new ResourceNotFoundException("Unable to find user with username=%s".formatted(username)));
+    public AuthToken createAuthToken(String email, String password) throws ResourceNotFoundException, AuthenticationException {
+        User user = this.userDao.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Unable to find user with email=%s".formatted(email)));
 
         UserCredentials userCredentials = this.userDao.findCredentialsById(user.id())
             .orElseThrow(() -> new IllegalStateException("User credentials not found for userId=%s".formatted(user.id())));
@@ -47,7 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (isPasswordMatch) {
             return this.generateAuthToken(user.id());
         } else {
-            throw new AuthenticationException("Invalid password for username=%s".formatted(username));
+            throw new AuthenticationException("Invalid password for email=%s".formatted(email));
         }
     }
 

@@ -3,6 +3,7 @@ package com.ruchij.service.user;
 import com.ruchij.dao.user.UserDao;
 import com.ruchij.dao.user.models.User;
 import com.ruchij.dao.user.models.UserCredentials;
+import com.ruchij.exception.ResourceConflictException;
 import com.ruchij.exception.ResourceNotFoundException;
 import com.ruchij.service.hashing.PasswordHashingService;
 import com.ruchij.service.random.RandomGenerator;
@@ -28,7 +29,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser() {
+    public User registerUser() throws ResourceConflictException {
         return this.registerUser(
             this.randomGenerator.username(),
             this.randomGenerator.password(),
@@ -37,11 +38,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(String username, String password, String email) {
+    public User registerUser(String username, String password, String email) throws ResourceConflictException {
         return this.registerUser(username, password, Optional.of(email));
     }
 
-    private User registerUser(String username, String password, Optional<String> email) {
+    private User registerUser(String username, String password, Optional<String> email) throws ResourceConflictException {
+        boolean isExistingUsername = this.userDao.findByUsername(username).isPresent();
+
+        if (isExistingUsername) {
+            throw new ResourceConflictException("username=%s already exists".formatted(username));
+        }
+
+        boolean isExistingEmail = email.flatMap(this.userDao::findByEmail).isPresent();
+
+        if (isExistingEmail) {
+            throw new ResourceConflictException("email=% already exists".formatted(email.get()));
+        }
+
         User user = new User(
             this.randomGenerator.uuid().toString(),
             username,

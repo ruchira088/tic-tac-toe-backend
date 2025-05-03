@@ -6,7 +6,7 @@ import com.ruchij.exception.AuthenticationException;
 import com.ruchij.exception.ResourceNotFoundException;
 
 public interface AuthenticationService {
-    AuthToken createAuthToken(String username, String password) throws ResourceNotFoundException, AuthenticationException;
+    AuthToken createAuthToken(String email, String password) throws ResourceNotFoundException, AuthenticationException;
 
     AuthToken createAuthToken(String userId) throws ResourceNotFoundException;
 

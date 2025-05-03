@@ -6,10 +6,10 @@ import java.time.Instant;
 import java.util.Optional;
 
 public record PendingGame(
-        @BsonId String id,
-        String name,
-        Instant createdAt,
-        String createdBy,
-        Optional<Instant> gameStartedAt
+    @BsonId String id,
+    String title,
+    Instant createdAt,
+    String createdBy,
+    Optional<Instant> gameStartedAt
 ) {
 }

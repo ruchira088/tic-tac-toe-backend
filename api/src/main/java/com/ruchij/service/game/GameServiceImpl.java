@@ -62,7 +62,7 @@ public class GameServiceImpl implements GameService {
 
         PendingGame updatedPendingGame = new PendingGame(
             pendingGame.id(),
-            pendingGame.name(),
+            pendingGame.title(),
             pendingGame.createdAt(),
             pendingGame.createdBy(),
             Optional.of(instant)
@@ -79,7 +79,7 @@ public class GameServiceImpl implements GameService {
 
         Game game = new Game(
             pendingGame.id(),
-            pendingGame.name(),
+            pendingGame.title(),
             pendingGame.createdAt(),
             pendingGame.createdBy(),
             instant,

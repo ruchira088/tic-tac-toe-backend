@@ -22,15 +22,18 @@ class MongoUserDaoImplTest {
 
     @Container
     private static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:8");
-
+    private final Faker faker = Faker.instance();
     private MongoClient mongoClient;
     private UserDao userDao;
-
-    private final Faker faker = Faker.instance();
 
     @BeforeAll
     static void beforeAll() {
         MONGO_DB_CONTAINER.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        MONGO_DB_CONTAINER.stop();
     }
 
     @BeforeEach
@@ -155,10 +158,5 @@ class MongoUserDaoImplTest {
     @AfterEach
     void tearDown() {
         this.mongoClient.close();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        MONGO_DB_CONTAINER.stop();
     }
 }

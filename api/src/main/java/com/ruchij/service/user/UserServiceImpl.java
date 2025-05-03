@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = this.userDao.findById(userId);
 
         return user.orElseThrow(
-                () -> new ResourceNotFoundException("Unable to find user with ID=%s".formatted(userId))
+            () -> new ResourceNotFoundException("Unable to find user with ID=%s".formatted(userId))
         );
     }
 }

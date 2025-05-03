@@ -15,19 +15,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class MongoUserDaoImpl implements UserDao {
-    public record MongoUser(@BsonId String id, String username, String email, Instant createdAt) {
-        public User toUser() {
-            return new User(this.id, this.username, Optional.ofNullable(this.email), this.createdAt);
-        }
-
-        private static MongoUser fromUser(User user) {
-            return new MongoUser(user.id(), user.username(), user.email().orElse(null), user.createdAt());
-        }
-    }
-
     private final MongoCollection<MongoUser> userCollection;
     private final MongoCollection<UserCredentials> userCredentialsCollection;
-
     public MongoUserDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
         this.userCollection = mongoDatabase.getCollection("users-%s".formatted(collectionNameSuffix), MongoUser.class);
         this.userCredentialsCollection =
@@ -74,8 +63,18 @@ public class MongoUserDaoImpl implements UserDao {
     @Override
     public List<User> searchByUsername(String username) {
         return this.userCollection
-                .find(Filters.regex("username", Pattern.compile(username)))
-                .map(MongoUser::toUser)
-                .into(new ArrayList<>());
+            .find(Filters.regex("username", Pattern.compile(username)))
+            .map(MongoUser::toUser)
+            .into(new ArrayList<>());
+    }
+
+    public record MongoUser(@BsonId String id, String username, String email, Instant createdAt) {
+        private static MongoUser fromUser(User user) {
+            return new MongoUser(user.id(), user.username(), user.email().orElse(null), user.createdAt());
+        }
+
+        public User toUser() {
+            return new User(this.id, this.username, Optional.ofNullable(this.email), this.createdAt);
+        }
     }
 }

@@ -87,10 +87,10 @@ class GameEngineImplTest {
             )
         ));
 
-         /*
-            * X *
-            * X *
-            * X *
+        /*
+         * X *
+         * X *
+         * X *
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
             Set.of(
@@ -101,9 +101,9 @@ class GameEngineImplTest {
         ));
 
         /*
-            * * X
-            * * X
-            * * X
+         * * X
+         * * X
+         * * X
          */
         Assertions.assertEquals(Optional.of(Game.WinningRule.Vertical), gameEngineImpl.isWinner(
             Set.of(
@@ -219,9 +219,9 @@ class GameEngineImplTest {
         ));
 
         /*
-             * X *
-             * X *
-             * * X
+         * X *
+         * X *
+         * * X
          */
         Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
             Set.of(
@@ -232,9 +232,9 @@ class GameEngineImplTest {
         ));
 
         /*
-             * * X
-             * X *
-             * * X
+         * * X
+         * X *
+         * * X
          */
         Assertions.assertEquals(Optional.empty(), gameEngineImpl.isWinner(
             Set.of(
@@ -278,7 +278,7 @@ class GameEngineImplTest {
         );
 
         // This should not throw an exception
-        Assertions.assertDoesNotThrow(() -> 
+        Assertions.assertDoesNotThrow(() ->
             gameEngineImpl.checkMove(game, player1Id, new Game.Coordinate(0, 0))
         );
     }
@@ -313,7 +313,7 @@ class GameEngineImplTest {
             Optional.empty()
         );
 
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> 
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
             gameEngineImpl.checkMove(game, player3Id, new Game.Coordinate(0, 0))
         );
 
@@ -349,7 +349,7 @@ class GameEngineImplTest {
             Optional.empty()
         );
 
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> 
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
             gameEngineImpl.checkMove(game, player2Id, new Game.Coordinate(0, 0))
         );
 
@@ -385,7 +385,7 @@ class GameEngineImplTest {
             Optional.empty()
         );
 
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> 
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
             gameEngineImpl.checkMove(game, player1Id, new Game.Coordinate(1, 1))
         );
 
@@ -421,7 +421,7 @@ class GameEngineImplTest {
             Optional.empty()
         );
 
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> 
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
             gameEngineImpl.checkMove(game, player1Id, new Game.Coordinate(3, 3))
         );
 
@@ -460,7 +460,7 @@ class GameEngineImplTest {
             Optional.of(new Game.Winner(player1Id, Game.WinningRule.Horizontal))
         );
 
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> 
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
             gameEngineImpl.checkMove(game, player2Id, new Game.Coordinate(0, 2))
         );
 
@@ -911,7 +911,7 @@ class GameEngineImplTest {
             Optional.empty()
         );
 
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> 
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
             gameEngineImpl4x4.checkMove(game, player1Id, new Game.Coordinate(4, 4))
         );
 

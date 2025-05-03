@@ -23,15 +23,18 @@ class MongoGameDaoImplTest {
 
     @Container
     private static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:8");
-
+    private final Faker faker = Faker.instance();
     private MongoClient mongoClient;
     private GameDao gameDao;
-
-    private final Faker faker = Faker.instance();
 
     @BeforeAll
     static void beforeAll() {
         MONGO_DB_CONTAINER.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        MONGO_DB_CONTAINER.stop();
     }
 
     @BeforeEach
@@ -45,15 +48,15 @@ class MongoGameDaoImplTest {
     @Test
     void insertPendingGameShouldReturnPendingGame() {
         String id = UUID.randomUUID().toString();
-        String name = "Game " + faker.lorem().word();
+        String title = "Game " + faker.lorem().word();
         Instant createdAt = Instant.now();
         String createdBy = UUID.randomUUID().toString();
 
-        PendingGame pendingGame = new PendingGame(id, name, createdAt, createdBy, Optional.empty());
+        PendingGame pendingGame = new PendingGame(id, title, createdAt, createdBy, Optional.empty());
         PendingGame result = this.gameDao.insertPendingGame(pendingGame);
 
         Assertions.assertEquals(id, result.id());
-        Assertions.assertEquals(name, result.name());
+        Assertions.assertEquals(title, result.title());
         // Compare only the seconds part of the timestamps to handle precision loss
         Assertions.assertEquals(createdAt.getEpochSecond(), result.createdAt().getEpochSecond());
         Assertions.assertEquals(createdBy, result.createdBy());
@@ -63,18 +66,18 @@ class MongoGameDaoImplTest {
     @Test
     void findPendingGameByIdShouldReturnPendingGame() {
         String id = UUID.randomUUID().toString();
-        String name = "Game " + faker.lorem().word();
+        String title = "Game " + faker.lorem().word();
         Instant createdAt = Instant.now();
         String createdBy = UUID.randomUUID().toString();
 
-        PendingGame pendingGame = new PendingGame(id, name, createdAt, createdBy, Optional.empty());
+        PendingGame pendingGame = new PendingGame(id, title, createdAt, createdBy, Optional.empty());
         this.gameDao.insertPendingGame(pendingGame);
 
         Optional<PendingGame> result = this.gameDao.findPendingGameById(id);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(id, result.get().id());
-        Assertions.assertEquals(name, result.get().name());
+        Assertions.assertEquals(title, result.get().title());
         // Compare only the seconds part of the timestamp to handle precision loss
         Assertions.assertEquals(createdAt.getEpochSecond(), result.get().createdAt().getEpochSecond());
         Assertions.assertEquals(createdBy, result.get().createdBy());
@@ -91,20 +94,20 @@ class MongoGameDaoImplTest {
     @Test
     void updatePendingGameShouldReturnUpdatedPendingGame() {
         String id = UUID.randomUUID().toString();
-        String name = "Game " + faker.lorem().word();
+        String title = "Game " + faker.lorem().word();
         Instant createdAt = Instant.now();
         String createdBy = UUID.randomUUID().toString();
 
-        PendingGame pendingGame = new PendingGame(id, name, createdAt, createdBy, Optional.empty());
+        PendingGame pendingGame = new PendingGame(id, title, createdAt, createdBy, Optional.empty());
         this.gameDao.insertPendingGame(pendingGame);
 
         Instant gameStartedAt = Instant.now();
-        PendingGame updatedPendingGame = new PendingGame(id, name, createdAt, createdBy, Optional.of(gameStartedAt));
+        PendingGame updatedPendingGame = new PendingGame(id, title, createdAt, createdBy, Optional.of(gameStartedAt));
         Optional<PendingGame> result = this.gameDao.updatePendingGame(updatedPendingGame);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(id, result.get().id());
-        Assertions.assertEquals(name, result.get().name());
+        Assertions.assertEquals(title, result.get().title());
         // Compare only the seconds part of the timestamps to handle precision loss
         Assertions.assertEquals(createdAt.getEpochSecond(), result.get().createdAt().getEpochSecond());
         Assertions.assertEquals(createdBy, result.get().createdBy());
@@ -279,10 +282,5 @@ class MongoGameDaoImplTest {
     @AfterEach
     void tearDown() {
         this.mongoClient.close();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        MONGO_DB_CONTAINER.stop();
     }
 }

@@ -51,12 +51,12 @@ class HealthServiceImplTest {
     void setUp() {
         mongoClient = MongoClients.create(MONGO_DB_CONTAINER.getConnectionString());
         mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
-        
+
         executorService = Executors.newVirtualThreadPerTaskExecutor();
-        
+
         properties = new Properties();
         properties.setProperty("java.version", "21");
-        
+
         buildInformation = new BuildInformation(
             "test-service",
             "com.ruchij",
@@ -66,7 +66,7 @@ class HealthServiceImplTest {
             "main",
             "abc123"
         );
-        
+
         healthService = new HealthServiceImpl(
             mongoDatabase,
             executorService,
@@ -85,7 +85,7 @@ class HealthServiceImplTest {
     @Test
     void serviceInformationShouldReturnCorrectInformation() {
         ServiceInformation result = healthService.serviceInformation();
-        
+
         assertEquals("test-service", result.serviceName());
         assertEquals("1.0.0", result.serviceVersion());
         assertEquals("21", result.javaVersion());
@@ -100,7 +100,7 @@ class HealthServiceImplTest {
     void healthCheckShouldReturnHealthyWhenDatabaseIsUp() {
         // Using the real MongoDB container
         HealthCheck result = healthService.healthCheck();
-        
+
         assertEquals(HealthCheck.Status.Healthy, result.database());
         assertTrue(result.isHealthy());
     }
@@ -110,7 +110,7 @@ class HealthServiceImplTest {
         // Create a client with invalid connection string to simulate database being down
         MongoClient invalidClient = MongoClients.create("mongodb://localhost:27999");
         MongoDatabase invalidDatabase = invalidClient.getDatabase("invalid-db");
-        
+
         HealthServiceImpl unhealthyService = new HealthServiceImpl(
             invalidDatabase,
             executorService,
@@ -118,13 +118,13 @@ class HealthServiceImplTest {
             properties,
             buildInformation
         );
-        
+
         // Test with invalid database connection
         HealthCheck result = unhealthyService.healthCheck();
-        
+
         assertEquals(HealthCheck.Status.Unhealthy, result.database());
         assertFalse(result.isHealthy());
-        
+
         invalidClient.close();
     }
 
@@ -132,7 +132,7 @@ class HealthServiceImplTest {
     void healthCheckShouldHandleTimeout() {
         // Create a HealthService with a small timeout by using a real database but with a test that completes quickly
         ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-        
+
         // This executor service will be busy with another task
         singleThreadExecutor.submit(() -> {
             try {
@@ -142,7 +142,7 @@ class HealthServiceImplTest {
                 // Ignore
             }
         });
-        
+
         HealthServiceImpl timeoutService = new HealthServiceImpl(
             mongoDatabase,
             singleThreadExecutor, // Use the busy executor service
@@ -150,13 +150,13 @@ class HealthServiceImplTest {
             properties,
             buildInformation
         );
-        
+
         // The health check should timeout as the executor is busy
         HealthCheck result = timeoutService.healthCheck();
-        
+
         assertEquals(HealthCheck.Status.Unhealthy, result.database());
         assertFalse(result.isHealthy());
-        
+
         singleThreadExecutor.shutdownNow();
     }
 }

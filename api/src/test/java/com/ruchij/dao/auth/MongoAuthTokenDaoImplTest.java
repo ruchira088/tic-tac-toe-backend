@@ -20,15 +20,18 @@ class MongoAuthTokenDaoImplTest {
 
     @Container
     private static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:8");
-
+    private final Faker faker = Faker.instance();
     private MongoClient mongoClient;
     private AuthTokenDao authTokenDao;
-
-    private final Faker faker = Faker.instance();
 
     @BeforeAll
     static void beforeAll() {
         MONGO_DB_CONTAINER.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        MONGO_DB_CONTAINER.stop();
     }
 
     @BeforeEach
@@ -111,10 +114,5 @@ class MongoAuthTokenDaoImplTest {
     @AfterEach
     void tearDown() {
         this.mongoClient.close();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        MONGO_DB_CONTAINER.stop();
     }
 }

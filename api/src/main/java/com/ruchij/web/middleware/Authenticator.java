@@ -17,6 +17,21 @@ public class Authenticator {
         this.authenticationService = authenticationService;
     }
 
+    public static String getToken(Context context) throws Exception {
+        String authorizationHeader = context.header(Header.AUTHORIZATION);
+
+        if (authorizationHeader == null) {
+            throw new AuthenticationException("Missing %s header".formatted(Header.AUTHORIZATION));
+        }
+
+        if (!authorizationHeader.startsWith(AUTH_TYPE)) {
+            throw new AuthenticationException("Unsupported auth type");
+        }
+
+        String token = authorizationHeader.substring(AUTH_TYPE.length()).trim();
+        return token;
+    }
+
     private User authenticate(Context context) throws Exception {
         String token = Authenticator.getToken(context);
         User user = this.authenticationService.authenticate(token);
@@ -50,21 +65,6 @@ public class Authenticator {
             User user = this.authenticate(context);
             authUserHandler.handle(user, context);
         });
-    }
-
-    public static String getToken(Context context) throws Exception {
-        String authorizationHeader = context.header(Header.AUTHORIZATION);
-
-        if (authorizationHeader == null) {
-            throw new AuthenticationException("Missing %s header".formatted(Header.AUTHORIZATION));
-        }
-
-        if (!authorizationHeader.startsWith(AUTH_TYPE)) {
-            throw new AuthenticationException("Unsupported auth type");
-        }
-
-        String token = authorizationHeader.substring(AUTH_TYPE.length()).trim();
-        return token;
     }
 
     public User authenticate(WsConnectContext wsConnectContext) throws Exception {

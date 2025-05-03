@@ -73,7 +73,7 @@ public class GameRoute implements EndpointGroup {
                 context.status(HttpStatus.OK).json(game);
             });
 
-            this.authenticator.post("/move", (user ,context) -> {
+            this.authenticator.post("/move", (user, context) -> {
                 String gameId = context.pathParam("gameId");
                 Game.Coordinate coordinate = context.bodyAsClass(Game.Coordinate.class);
 

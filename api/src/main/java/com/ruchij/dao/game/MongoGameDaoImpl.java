@@ -15,74 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class MongoGameDaoImpl implements GameDao {
-    public record MongoGame(
-            @BsonId String id,
-            String name,
-            Instant createdAt,
-            String createdBy,
-            Instant startedAt,
-            String playerOneId,
-            String playerTwoId,
-            List<Game.Move> moves,
-            Game.Winner winner
-    ) {
-        public Game toGame() {
-            return new Game(
-                    id,
-                    name,
-                    createdAt,
-                    createdBy,
-                    startedAt,
-                    playerOneId,
-                    playerTwoId,
-                    moves,
-                    Optional.ofNullable(winner)
-            );
-        }
-
-        public static MongoGame fromGame(Game game) {
-            return new MongoGame(
-                    game.id(),
-                    game.name(),
-                    game.createdAt(),
-                    game.createdBy(),
-                    game.startedAt(),
-                    game.playerOneId(),
-                    game.playerTwoId(),
-                    game.moves(),
-                    game.winner().orElse(null)
-            );
-        }
-    }
-
-    public record MongoPendingGame(
-            @BsonId String id,
-            String name,
-            Instant createdAt,
-            String createdBy,
-            Instant gameStartedAt
-    ) {
-        public PendingGame toPendingGame() {
-            return new PendingGame(
-                    id,
-                    name,
-                    createdAt,
-                    createdBy,
-                    Optional.ofNullable(gameStartedAt)
-            );
-        }
-
-        public static MongoPendingGame fromPendingGame(PendingGame pendingGame) {
-            return new MongoPendingGame(
-                    pendingGame.id(),
-                    pendingGame.name(),
-                    pendingGame.createdAt(),
-                    pendingGame.createdBy(),
-                    pendingGame.gameStartedAt().orElse(null)
-            );
-        }
-    }
-
     private final MongoCollection<MongoPendingGame> pendingGamesCollection;
     private final MongoCollection<MongoGame> gamesCollection;
 
@@ -137,7 +69,7 @@ public class MongoGameDaoImpl implements GameDao {
     @Override
     public Optional<Game> updateGame(Game game) {
         UpdateResult updateResult = this.gamesCollection.replaceOne(
-            Filters.eq("_id", game.id()), 
+            Filters.eq("_id", game.id()),
             MongoGame.fromGame(game)
         );
 
@@ -152,5 +84,73 @@ public class MongoGameDaoImpl implements GameDao {
     public List<PendingGame> getPendingGames(int limit, int offset) {
         List<MongoPendingGame> mongoPendingGames = this.pendingGamesCollection.find().skip(offset).limit(limit).into(new ArrayList<>());
         return mongoPendingGames.stream().map(MongoPendingGame::toPendingGame).toList();
+    }
+
+    public record MongoGame(
+        @BsonId String id,
+        String name,
+        Instant createdAt,
+        String createdBy,
+        Instant startedAt,
+        String playerOneId,
+        String playerTwoId,
+        List<Game.Move> moves,
+        Game.Winner winner
+    ) {
+        public static MongoGame fromGame(Game game) {
+            return new MongoGame(
+                game.id(),
+                game.name(),
+                game.createdAt(),
+                game.createdBy(),
+                game.startedAt(),
+                game.playerOneId(),
+                game.playerTwoId(),
+                game.moves(),
+                game.winner().orElse(null)
+            );
+        }
+
+        public Game toGame() {
+            return new Game(
+                id,
+                name,
+                createdAt,
+                createdBy,
+                startedAt,
+                playerOneId,
+                playerTwoId,
+                moves,
+                Optional.ofNullable(winner)
+            );
+        }
+    }
+
+    public record MongoPendingGame(
+        @BsonId String id,
+        String title,
+        Instant createdAt,
+        String createdBy,
+        Instant gameStartedAt
+    ) {
+        public static MongoPendingGame fromPendingGame(PendingGame pendingGame) {
+            return new MongoPendingGame(
+                pendingGame.id(),
+                pendingGame.title(),
+                pendingGame.createdAt(),
+                pendingGame.createdBy(),
+                pendingGame.gameStartedAt().orElse(null)
+            );
+        }
+
+        public PendingGame toPendingGame() {
+            return new PendingGame(
+                id,
+                title,
+                createdAt,
+                createdBy,
+                Optional.ofNullable(gameStartedAt)
+            );
+        }
     }
 }

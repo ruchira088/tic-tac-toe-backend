@@ -38,6 +38,30 @@ public class HealthServiceImpl implements HealthService {
         this.buildInformation = buildInformation;
     }
 
+    public static HealthServiceImpl create(MongoDatabase mongoDatabase, Clock clock, Properties properties) throws IOException {
+        InputStream inputStream = HealthServiceImpl.class.getClassLoader().getResourceAsStream("build-information.json");
+        BuildInformation buildInformation;
+
+        if (inputStream == null) {
+            buildInformation = new BuildInformation(
+                "tic-tac-toe-backend",
+                "com.ruchij",
+                "UNKNOWN",
+                "UNKNOWN",
+                null,
+                "UNKNOWN",
+                "UNKNOWN"
+
+            );
+        } else {
+            buildInformation = JsonUtils.objectMapper.readValue(inputStream, BuildInformation.class);
+        }
+
+        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+
+        return new HealthServiceImpl(mongoDatabase, executorService, clock, properties, buildInformation);
+    }
+
     @Override
     public ServiceInformation serviceInformation() {
         String javaVersion = properties.getProperty("java.version", "unknown");
@@ -69,7 +93,6 @@ public class HealthServiceImpl implements HealthService {
         return new HealthCheck(databaseHealthStatus);
     }
 
-
     private HealthCheck.Status databaseHealthCheck() {
         try {
             Document ping = this.mongoDatabase.runCommand(new Document("ping", 1));
@@ -82,29 +105,5 @@ public class HealthServiceImpl implements HealthService {
         } catch (Exception __) {
             return HealthCheck.Status.Unhealthy;
         }
-    }
-
-    public static HealthServiceImpl create(MongoDatabase mongoDatabase, Clock clock, Properties properties) throws IOException {
-        InputStream inputStream = HealthServiceImpl.class.getClassLoader().getResourceAsStream("build-information.json");
-        BuildInformation buildInformation;
-
-        if (inputStream == null) {
-            buildInformation = new BuildInformation(
-                "tic-tac-toe-backend",
-                "com.ruchij",
-                "UNKNOWN",
-                "UNKNOWN",
-                null,
-                "UNKNOWN",
-                "UNKNOWN"
-
-            );
-        } else {
-            buildInformation = JsonUtils.objectMapper.readValue(inputStream, BuildInformation.class);
-        }
-
-        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-
-        return new HealthServiceImpl(mongoDatabase, executorService, clock, properties, buildInformation);
     }
 }

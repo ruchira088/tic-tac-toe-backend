@@ -14,7 +14,9 @@ public class ExceptionMapper {
         return (exception, context) -> {
             context.status(httpStatus).json(new ErrorResponse(exception.getMessage()));
         };
-    };
+    }
+
+    ;
 
     public static void handle(Javalin app) {
         app.exception(ValidationException.class, ExceptionMapper.handle(HttpStatus.BAD_REQUEST));

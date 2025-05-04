@@ -105,10 +105,14 @@ public class GameRoute implements EndpointGroup {
                         () -> {
                             wsConnectContext.send(
                                 new WebSocketResponse<>(WebSocketResponse.Type.PING,
-                                    this.clock.instant()
+                                    new WebSocketResponse.Ping(
+                                        user.id(),
+                                        user.username(),
+                                        this.clock.instant()
+                                    )
                                 ));
                         },
-                        10,
+                        5,
                         20,
                         TimeUnit.SECONDS
                     );

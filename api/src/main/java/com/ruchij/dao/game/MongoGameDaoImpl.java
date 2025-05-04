@@ -88,7 +88,7 @@ public class MongoGameDaoImpl implements GameDao {
 
     public record MongoGame(
         @BsonId String id,
-        String name,
+        String title,
         Instant createdAt,
         String createdBy,
         Instant startedAt,
@@ -100,7 +100,7 @@ public class MongoGameDaoImpl implements GameDao {
         public static MongoGame fromGame(Game game) {
             return new MongoGame(
                 game.id(),
-                game.name(),
+                game.title(),
                 game.createdAt(),
                 game.createdBy(),
                 game.startedAt(),
@@ -114,7 +114,7 @@ public class MongoGameDaoImpl implements GameDao {
         public Game toGame() {
             return new Game(
                 id,
-                name,
+                title,
                 createdAt,
                 createdBy,
                 startedAt,

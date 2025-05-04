@@ -115,7 +115,7 @@ public class GameServiceImpl implements GameService {
         Game updatedGame =
             new Game(
                 game.id(),
-                game.name(),
+                game.title(),
                 game.createdAt(),
                 game.createdBy(),
                 game.startedAt(),

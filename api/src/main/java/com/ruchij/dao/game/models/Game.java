@@ -9,7 +9,7 @@ import java.util.Optional;
 public record Game(
     @BsonId
     String id,
-    String name,
+    String title,
     Instant createdAt,
     String createdBy,
     Instant startedAt,

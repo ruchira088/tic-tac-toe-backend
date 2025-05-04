@@ -36,6 +36,8 @@ import io.javalin.json.JavalinJackson;
 import java.io.IOException;
 import java.time.Clock;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class App {
     public static void main(String[] args) throws IOException {
@@ -94,6 +96,16 @@ public class App {
 
         HealthService healthService = HealthServiceImpl.create(mongoDatabase, clock, properties);
 
-        return new Routes(userService, gameService, authenticationService, healthService);
+       ScheduledExecutorService scheduledExecutorService =
+           Executors.newScheduledThreadPool(10, Thread.ofVirtual().factory());
+
+        return new Routes(
+            userService,
+            gameService,
+            authenticationService,
+            healthService,
+            scheduledExecutorService,
+            clock
+        );
     }
 }

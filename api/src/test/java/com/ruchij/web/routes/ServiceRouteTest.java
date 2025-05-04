@@ -12,7 +12,9 @@ import okhttp3.Response;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.ruchij.utils.JsonUtils.objectMapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +27,8 @@ class ServiceRouteTest {
         GameService gameService = Mockito.mock(GameService.class);
         AuthenticationService authenticationService = Mockito.mock(AuthenticationService.class);
         HealthService healthService = Mockito.mock(HealthService.class);
+        ScheduledExecutorService scheduledExecutorService = Mockito.mock(ScheduledExecutorService.class);
+        Clock clock = Mockito.mock(Clock.class);
 
         Instant timestamp = Instant.parse("2023-02-05T04:37:42.566735Z");
 
@@ -40,7 +44,14 @@ class ServiceRouteTest {
                 timestamp
             ));
 
-        Routes routes = new Routes(userService, gameService, authenticationService, healthService);
+        Routes routes = new Routes(
+            userService,
+            gameService,
+            authenticationService,
+            healthService,
+            scheduledExecutorService,
+            clock
+        );
 
         JavalinTest.test(App.javalin(routes), ((server, client) -> {
             Response response = client.get("/service/info");

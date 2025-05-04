@@ -10,6 +10,9 @@ import com.ruchij.web.routes.ServiceRoute;
 import com.ruchij.web.routes.UserRoute;
 import io.javalin.apibuilder.EndpointGroup;
 
+import java.time.Clock;
+import java.util.concurrent.ScheduledExecutorService;
+
 import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class Routes implements EndpointGroup {
@@ -22,11 +25,13 @@ public class Routes implements EndpointGroup {
         UserService userService,
         GameService gameService,
         AuthenticationService authenticationService,
-        HealthService healthService
+        HealthService healthService,
+        ScheduledExecutorService scheduledExecutorService,
+        Clock clock
     ) {
         this.userRoute = new UserRoute(userService, authenticationService);
         this.serviceRoute = new ServiceRoute(healthService);
-        this.gameRoute = new GameRoute(gameService, authenticationService);
+        this.gameRoute = new GameRoute(gameService, authenticationService, scheduledExecutorService, clock);
         this.authRoute = new AuthRoute(authenticationService);
     }
 

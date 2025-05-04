@@ -12,7 +12,11 @@ import com.ruchij.web.responses.WebSocketResponse;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
 
+import java.time.Clock;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.ws;
@@ -20,10 +24,19 @@ import static io.javalin.apibuilder.ApiBuilder.ws;
 public class GameRoute implements EndpointGroup {
     private final GameService gameService;
     private final Authenticator authenticator;
+    private final ScheduledExecutorService scheduledExecutorService;
+    private final Clock clock;
 
-    public GameRoute(GameService gameService, AuthenticationService authenticationService) {
+    public GameRoute(
+        GameService gameService,
+        AuthenticationService authenticationService,
+        ScheduledExecutorService scheduledExecutorService,
+        Clock clock
+    ) {
         this.gameService = gameService;
         this.authenticator = new Authenticator(authenticationService);
+        this.scheduledExecutorService = scheduledExecutorService;
+        this.clock = clock;
     }
 
     @Override
@@ -86,8 +99,19 @@ public class GameRoute implements EndpointGroup {
                 ws.onConnect(wsConnectContext -> {
                     User user = this.authenticator.authenticate(wsConnectContext);
 
-                    wsConnectContext.enableAutomaticPings();
                     String gameId = wsConnectContext.pathParam("gameId");
+
+                    ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
+                        () -> {
+                            wsConnectContext.send(
+                                new WebSocketResponse<>(WebSocketResponse.Type.PING,
+                                    this.clock.instant()
+                                ));
+                        },
+                        10,
+                        20,
+                        TimeUnit.SECONDS
+                    );
 
                     String registrationId =
                         this.gameService.registerForUpdates(
@@ -102,6 +126,7 @@ public class GameRoute implements EndpointGroup {
 
                     ws.onClose(wsCloseContext -> {
                         this.gameService.unregisterForUpdates(registrationId);
+                        scheduledFuture.cancel(true);
                     });
                 });
             });

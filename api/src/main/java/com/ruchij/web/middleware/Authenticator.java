@@ -68,7 +68,7 @@ public class Authenticator {
     }
 
     public User authenticate(WsConnectContext wsConnectContext) throws Exception {
-        String authToken = wsConnectContext.cookie("authToken");
+        String authToken = wsConnectContext.cookie("auth_token");
 
         if (authToken == null) {
             throw new AuthenticationException("Missing authToken cookie");

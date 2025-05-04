@@ -2,6 +2,7 @@ package com.ruchij.web.routes;
 
 import com.ruchij.dao.game.models.Game;
 import com.ruchij.dao.game.models.PendingGame;
+import com.ruchij.dao.user.models.User;
 import com.ruchij.service.auth.AuthenticationService;
 import com.ruchij.service.game.GameService;
 import com.ruchij.web.middleware.Authenticator;
@@ -83,7 +84,7 @@ public class GameRoute implements EndpointGroup {
 
             ws("/updates", ws -> {
                 ws.onConnect(wsConnectContext -> {
-                    this.authenticator.authenticate(wsConnectContext);
+                    User user = this.authenticator.authenticate(wsConnectContext);
 
                     wsConnectContext.enableAutomaticPings();
                     String gameId = wsConnectContext.pathParam("gameId");

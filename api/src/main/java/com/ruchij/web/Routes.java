@@ -39,10 +39,10 @@ public class Routes implements EndpointGroup {
 
     @Override
     public void addEndpoints() {
-        path("service", this.serviceRoute);
-        path("user", this.userRoute);
-        path("game", this.gameRoute);
-        path("auth", this.authRoute);
+        path("/service", this.serviceRoute);
+        path("/user", this.userRoute);
+        path("/game", this.gameRoute);
+        path("/auth", this.authRoute);
     }
 
 }

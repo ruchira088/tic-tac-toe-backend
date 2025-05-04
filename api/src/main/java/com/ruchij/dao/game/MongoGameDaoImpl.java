@@ -19,8 +19,8 @@ public class MongoGameDaoImpl implements GameDao {
     private final MongoCollection<MongoGame> gamesCollection;
 
     public MongoGameDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
-        this.pendingGamesCollection = mongoDatabase.getCollection("pending_games-%s".formatted(collectionNameSuffix), MongoPendingGame.class);
-        this.gamesCollection = mongoDatabase.getCollection("games", MongoGame.class);
+        this.pendingGamesCollection = mongoDatabase.getCollection("pending-games-%s".formatted(collectionNameSuffix), MongoPendingGame.class);
+        this.gamesCollection = mongoDatabase.getCollection("games-%s".formatted(collectionNameSuffix), MongoGame.class);
     }
 
     @Override

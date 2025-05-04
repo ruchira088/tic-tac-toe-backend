@@ -17,10 +17,11 @@ import java.util.regex.Pattern;
 public class MongoUserDaoImpl implements UserDao {
     private final MongoCollection<MongoUser> userCollection;
     private final MongoCollection<UserCredentials> userCredentialsCollection;
+
     public MongoUserDaoImpl(MongoDatabase mongoDatabase, String collectionNameSuffix) {
         this.userCollection = mongoDatabase.getCollection("users-%s".formatted(collectionNameSuffix), MongoUser.class);
         this.userCredentialsCollection =
-            mongoDatabase.getCollection("user_credentials-%s".formatted(collectionNameSuffix), UserCredentials.class);
+            mongoDatabase.getCollection("user-credentials-%s".formatted(collectionNameSuffix), UserCredentials.class);
     }
 
     @Override

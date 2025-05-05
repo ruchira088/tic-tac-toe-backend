@@ -66,6 +66,7 @@ public class ApiApp {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutting down server...");
             app.stop();
+            logger.info("Server has been shut down.");
         }));
     }
 

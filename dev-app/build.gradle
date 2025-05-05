@@ -1,0 +1,16 @@
+plugins {
+    id 'application'
+    id 'com.github.ben-manes.versions' version "$dependencyUpdatesPluginVersion"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(
+            project(':api'),
+            "org.testcontainers:mongodb:$testcontainersVersion"
+
+    )
+}

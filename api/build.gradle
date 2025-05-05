@@ -7,7 +7,7 @@ plugins {
     id 'jacoco'
 }
 
-group = 'com.ruchij'
+group = 'com.ruchij.api'
 
 repositories {
     mavenCentral()
@@ -31,14 +31,13 @@ dependencies {
             'org.junit.jupiter:junit-jupiter',
             'org.junit.platform:junit-platform-launcher',
             "org.mockito:mockito-core:$mockitoVersion",
-            "org.testcontainers:testcontainers:$testcontainersVersion",
             "org.testcontainers:junit-jupiter:$testcontainersVersion",
             "org.testcontainers:mongodb:$testcontainersVersion"
     )
 }
 
 application {
-    mainClass = 'com.ruchij.api.App'
+    mainClass = 'com.ruchij.api.ApiApp'
 }
 
 tasks.register('buildInformation') {

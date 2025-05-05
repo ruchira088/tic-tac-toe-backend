@@ -8,5 +8,6 @@
  */
 
 rootProject.name = 'tic-tac-toe-backend'
+
 include('api')
 include('dev-app')

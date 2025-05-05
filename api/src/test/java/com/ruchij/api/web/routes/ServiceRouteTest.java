@@ -1,6 +1,6 @@
 package com.ruchij.api.web.routes;
 
-import com.ruchij.api.App;
+import com.ruchij.api.ApiApp;
 import com.ruchij.api.service.auth.AuthenticationService;
 import com.ruchij.api.service.game.GameService;
 import com.ruchij.api.service.health.HealthService;
@@ -53,7 +53,7 @@ class ServiceRouteTest {
             clock
         );
 
-        JavalinTest.test(App.javalin(routes), ((server, client) -> {
+        JavalinTest.test(ApiApp.javalin(routes), ((server, client) -> {
             Response response = client.get("/service/info");
             assertEquals(200, response.code());
 

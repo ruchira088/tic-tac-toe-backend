@@ -62,12 +62,20 @@ public class ApiApp {
         app.start(applicationConfiguration.httpConfiguration().port());
 
         logger.info("Server is listening on port {}...", applicationConfiguration.httpConfiguration().port());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Shutting down server...");
+            app.stop();
+        }));
     }
 
     public static Javalin javalin(Routes routes) {
         return Javalin.create(javalinConfig -> {
             javalinConfig.useVirtualThreads = true;
             javalinConfig.jsonMapper(new JavalinJackson(JsonUtils.objectMapper, true));
+
+            // wait 7 seconds for existing requests to finish
+            javalinConfig.jetty.modifyServer(server -> server.setStopTimeout(7_000));
 
             javalinConfig.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> {

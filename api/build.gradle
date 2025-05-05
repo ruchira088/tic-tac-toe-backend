@@ -38,7 +38,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'com.ruchij.App'
+    mainClass = 'com.ruchij.api.App'
 }
 
 tasks.register('buildInformation') {

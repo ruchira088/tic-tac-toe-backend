@@ -1,0 +1,121 @@
+package com.ruchij.api.service.game;
+
+import com.ruchij.api.dao.game.models.Game;
+import com.ruchij.api.exception.ValidationException;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class GameEngineImpl implements GameEngine {
+    private static final int DEFAULT_GRID_SIZE = 3;
+    private final int gridSize;
+
+    public GameEngineImpl(int gridSize) {
+        if (gridSize < 1) {
+            throw new IllegalArgumentException("gridSize must be greater than 0");
+        }
+
+        this.gridSize = gridSize;
+    }
+
+    public GameEngineImpl() {
+        this(DEFAULT_GRID_SIZE);
+    }
+
+    @Override
+    public void checkMove(Game game, String playerId, Game.Coordinate coordinate) throws ValidationException {
+        if (game.winner().isPresent()) {
+            throw new ValidationException("Game gameId=%s already has a winner".formatted(game.id()));
+        }
+
+        if (!Set.of(game.playerOneId(), game.playerTwoId()).contains(playerId)) {
+            throw new ValidationException("playerId=%s is not a player in gameId=%s".formatted(playerId, game.id()));
+        }
+
+        boolean isVacant = game.moves().stream()
+            .skip(Math.max(0, game.moves().size() - gridSize * 2))
+            .noneMatch(move -> move.coordinate().equals(coordinate));
+
+        if (!isVacant) {
+            throw new ValidationException("%s is NOT vacant".formatted(coordinate));
+        }
+
+        boolean isPlayerTurn =
+            (game.moves().isEmpty() && game.playerOneId().equals(playerId)) ||
+                !game.moves().getLast().playerId().equals(playerId);
+
+        if (!isPlayerTurn) {
+            throw new ValidationException(
+                "It is NOT the current turn for playerId=%s in gameId=%s"
+                    .formatted(playerId, game.moves())
+            );
+        }
+
+        if (coordinate.x() < 0 || coordinate.x() >= gridSize || coordinate.y() < 0 || coordinate.y() >= gridSize) {
+            throw new ValidationException("Coordinate x=%s, y=%s is out of bounds".formatted(coordinate.x(), coordinate.y()));
+        }
+    }
+
+    @Override
+    public Optional<Game.Winner> getWinner(Game game) {
+        Map<String, List<Game.Move>> movesByPlayer = game.moves().stream()
+            .skip(Math.max(0, game.moves().size() - gridSize * 2))
+            .collect(Collectors.groupingBy(move -> move.playerId()));
+
+        Optional<Game.Winner> winner = movesByPlayer.entrySet().stream()
+            .filter(entry -> entry.getValue().size() >= gridSize)
+            .flatMap(entry -> {
+                Set<Game.Coordinate> coordinates =
+                    entry.getValue().stream().map(Game.Move::coordinate).collect(Collectors.toSet());
+
+                return isWinner(coordinates)
+                    .map(winningRule -> new Game.Winner(entry.getKey(), winningRule))
+                    .stream();
+            })
+            .findFirst();
+
+        return winner;
+    }
+
+    Optional<Game.WinningRule> isWinner(Set<Game.Coordinate> coordinates) {
+        if (coordinates.size() >= gridSize) {
+            for (Game.Coordinate baseCoordinate : coordinates) {
+                boolean isHorizontalWin =
+                    coordinates.stream()
+                        .filter(coordinate -> coordinate.y() == baseCoordinate.y())
+                        .count() == gridSize;
+
+                if (isHorizontalWin) {
+                    return Optional.of(Game.WinningRule.Horizontal);
+                }
+
+                boolean isVerticalWin =
+                    coordinates.stream()
+                        .filter(coordinate -> coordinate.x() == baseCoordinate.x())
+                        .count() == gridSize;
+
+                if (isVerticalWin) {
+                    return Optional.of(Game.WinningRule.Vertical);
+                }
+
+                HashSet<Game.Coordinate> rightDiagonal = new HashSet<>();
+                HashSet<Game.Coordinate> leftDiagonal = new HashSet<>();
+
+                for (int i = 0; i < gridSize; i++) {
+                    leftDiagonal.add(new Game.Coordinate(i, i));
+                    rightDiagonal.add(new Game.Coordinate(gridSize - 1 - i, i));
+                }
+
+                boolean isRightDiagonalWin = coordinates.containsAll(rightDiagonal);
+                boolean isLeftDiagonalWin = coordinates.containsAll(leftDiagonal);
+
+                if (isRightDiagonalWin || isLeftDiagonalWin) {
+                    return Optional.of(Game.WinningRule.Diagonal);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+}

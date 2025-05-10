@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 public class GameServiceImpl implements GameService {
-    private static Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
     private final GameDao gameDao;
     private final GameEngine gameEngine;

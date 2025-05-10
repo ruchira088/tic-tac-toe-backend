@@ -82,7 +82,13 @@ public class MongoGameDaoImpl implements GameDao {
 
     @Override
     public List<PendingGame> getPendingGames(int limit, int offset) {
-        List<MongoPendingGame> mongoPendingGames = this.pendingGamesCollection.find().skip(offset).limit(limit).into(new ArrayList<>());
+        List<MongoPendingGame> mongoPendingGames =
+            this.pendingGamesCollection
+                .find(Filters.eq("gameStartedAt", null))
+                .skip(offset)
+                .limit(limit)
+                .into(new ArrayList<>());
+
         return mongoPendingGames.stream().map(MongoPendingGame::toPendingGame).toList();
     }
 

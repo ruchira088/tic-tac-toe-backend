@@ -12,11 +12,13 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 public class GameServiceImpl implements GameService {
     private final GameDao gameDao;
     private final GameEngine gameEngine;
+    private final ExecutorService executorService;
     private final Clock clock;
     private final RandomGenerator randomGenerator;
     private final Map<String, Map<String, Consumer<Game.Move>>> moveUpdates = new ConcurrentHashMap<>();
@@ -26,11 +28,13 @@ public class GameServiceImpl implements GameService {
     public GameServiceImpl(
         GameDao gameDao,
         GameEngine gameEngine,
+        ExecutorService executorService,
         Clock clock,
         RandomGenerator randomGenerator
     ) {
         this.gameDao = gameDao;
         this.gameEngine = gameEngine;
+        this.executorService = executorService;
         this.clock = clock;
         this.randomGenerator = randomGenerator;
     }
@@ -133,11 +137,28 @@ public class GameServiceImpl implements GameService {
                 )
             );
 
-        this.moveUpdates.getOrDefault(gameId, new HashMap<>())
-            .forEach((__, moveUpdates) -> moveUpdates.accept(move));
+        this.executorService.submit(() -> {
+            this.moveUpdates.getOrDefault(gameId, new HashMap<>())
+                .forEach((registrationId, moveUpdates) -> {
+                    try {
+                        moveUpdates.accept(move);
+                    } catch (Exception exception) {
+                        this.unregisterForUpdates(registrationId);
+                    }
+                });
+        });
 
-        winner.ifPresent(gameWinner -> this.winnerUpdates.getOrDefault(gameId, new HashMap<>())
-            .forEach((__, winnerUpdates) -> winnerUpdates.accept(gameWinner)));
+
+        this.executorService.submit(() -> {
+            winner.ifPresent(gameWinner -> this.winnerUpdates.getOrDefault(gameId, new HashMap<>())
+                .forEach((registrationId, winnerUpdates) -> {
+                    try {
+                        winnerUpdates.accept(gameWinner);
+                    } catch (Exception exception) {
+                        this.unregisterForUpdates(registrationId);
+                    }
+                }));
+        });
 
         return updatedGame;
     }

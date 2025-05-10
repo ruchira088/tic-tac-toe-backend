@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Clock;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -107,7 +108,8 @@ public class ApiApp {
 
         GameDao gameDao = new MongoGameDaoImpl(mongoDatabase, mongoCollectionNamePrefix);
         GameEngine gameEngine = new GameEngineImpl();
-        GameService gameService = new GameServiceImpl(gameDao, gameEngine, clock, randomGenerator);
+        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+        GameService gameService = new GameServiceImpl(gameDao, gameEngine, executorService, clock, randomGenerator);
 
         AuthTokenDao authTokenDao = new MongoAuthTokenDaoImpl(mongoDatabase, mongoCollectionNamePrefix);
         AuthenticationService authenticationService =

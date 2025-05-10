@@ -258,9 +258,9 @@ class GameServiceImplTest {
         // Assert
         assertEquals(TEST_GAME_ID, result.id());
         assertEquals(1, result.moves().size());
-        assertEquals(PLAYER_ONE_ID, result.moves().get(0).playerId());
-        assertEquals(FIXED_INSTANT, result.moves().get(0).performedAt());
-        assertEquals(coordinate, result.moves().get(0).coordinate());
+        assertEquals(PLAYER_ONE_ID, result.moves().getFirst().playerId());
+        assertEquals(FIXED_INSTANT, result.moves().getFirst().performedAt());
+        assertEquals(coordinate, result.moves().getFirst().coordinate());
         assertTrue(result.winner().isEmpty());
 
         // Verify interactions
@@ -275,9 +275,9 @@ class GameServiceImplTest {
         Game capturedGame = gameCaptor.getValue();
         assertEquals(TEST_GAME_ID, capturedGame.id());
         assertEquals(1, capturedGame.moves().size());
-        assertEquals(PLAYER_ONE_ID, capturedGame.moves().get(0).playerId());
-        assertEquals(FIXED_INSTANT, capturedGame.moves().get(0).performedAt());
-        assertEquals(coordinate, capturedGame.moves().get(0).coordinate());
+        assertEquals(PLAYER_ONE_ID, capturedGame.moves().getFirst().playerId());
+        assertEquals(FIXED_INSTANT, capturedGame.moves().getFirst().performedAt());
+        assertEquals(coordinate, capturedGame.moves().getFirst().coordinate());
         assertTrue(capturedGame.winner().isEmpty());
 
         // Verify executorService was called to notify listeners
@@ -315,9 +315,9 @@ class GameServiceImplTest {
         // Assert
         assertEquals(TEST_GAME_ID, result.id());
         assertEquals(1, result.moves().size());
-        assertEquals(PLAYER_ONE_ID, result.moves().get(0).playerId());
-        assertEquals(FIXED_INSTANT, result.moves().get(0).performedAt());
-        assertEquals(coordinate, result.moves().get(0).coordinate());
+        assertEquals(PLAYER_ONE_ID, result.moves().getFirst().playerId());
+        assertEquals(FIXED_INSTANT, result.moves().getFirst().performedAt());
+        assertEquals(coordinate, result.moves().getFirst().coordinate());
         assertTrue(result.winner().isPresent());
         assertEquals(PLAYER_ONE_ID, result.winner().get().playerId());
         assertEquals(Game.WinningRule.Horizontal, result.winner().get().winningRule());
@@ -334,9 +334,9 @@ class GameServiceImplTest {
         Game capturedGame = gameCaptor.getValue();
         assertEquals(TEST_GAME_ID, capturedGame.id());
         assertEquals(1, capturedGame.moves().size());
-        assertEquals(PLAYER_ONE_ID, capturedGame.moves().get(0).playerId());
-        assertEquals(FIXED_INSTANT, capturedGame.moves().get(0).performedAt());
-        assertEquals(coordinate, capturedGame.moves().get(0).coordinate());
+        assertEquals(PLAYER_ONE_ID, capturedGame.moves().getFirst().playerId());
+        assertEquals(FIXED_INSTANT, capturedGame.moves().getFirst().performedAt());
+        assertEquals(coordinate, capturedGame.moves().getFirst().coordinate());
         assertTrue(capturedGame.winner().isPresent());
         assertEquals(PLAYER_ONE_ID, capturedGame.winner().get().playerId());
         assertEquals(Game.WinningRule.Horizontal, capturedGame.winner().get().winningRule());

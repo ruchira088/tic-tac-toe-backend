@@ -80,7 +80,7 @@ public class ApiApp {
 
             javalinConfig.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> {
-                    rule.allowHost("http://localhost:5173", "*.ruchij.com");
+                    rule.allowHost("http://localhost:5173", "http://localhost:3000", "*.ruchij.com");
                     rule.allowCredentials = true;
                 });
             });

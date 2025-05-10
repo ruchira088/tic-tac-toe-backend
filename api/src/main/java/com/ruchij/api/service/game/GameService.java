@@ -5,9 +5,10 @@ import com.ruchij.api.dao.game.models.PendingGame;
 import com.ruchij.api.exception.ResourceConflictException;
 import com.ruchij.api.exception.ResourceNotFoundException;
 import com.ruchij.api.exception.ValidationException;
+import com.ruchij.api.utils.ThrowableConsumer;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
 
 public interface GameService {
     PendingGame createGame(String name, String playerId);
@@ -27,8 +28,8 @@ public interface GameService {
 
     String registerForUpdates(
         String gameId,
-        Consumer<Game.Move> moveUpdates,
-        Consumer<Game.Winner> winnerUpdates
+        ThrowableConsumer<Game.Move, IOException> moveUpdates,
+        ThrowableConsumer<Game.Winner, IOException> winnerUpdates
     ) throws ResourceNotFoundException;
 
     void unregisterForUpdates(String registrationId);

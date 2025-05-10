@@ -7,22 +7,27 @@ import com.ruchij.api.exception.ResourceConflictException;
 import com.ruchij.api.exception.ResourceNotFoundException;
 import com.ruchij.api.exception.ValidationException;
 import com.ruchij.api.service.random.RandomGenerator;
+import com.ruchij.api.utils.ThrowableConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
 
 public class GameServiceImpl implements GameService {
+    private static Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
+
     private final GameDao gameDao;
     private final GameEngine gameEngine;
     private final ExecutorService executorService;
     private final Clock clock;
     private final RandomGenerator randomGenerator;
-    private final Map<String, Map<String, Consumer<Game.Move>>> moveUpdates = new ConcurrentHashMap<>();
-    private final Map<String, Map<String, Consumer<Game.Winner>>> winnerUpdates = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, ThrowableConsumer<Game.Move, IOException>>> moveUpdates = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, ThrowableConsumer<Game.Winner, IOException>>> winnerUpdates = new ConcurrentHashMap<>();
     private final Map<String, String> registrationIdToGameId = new ConcurrentHashMap<>();
 
     public GameServiceImpl(
@@ -142,7 +147,7 @@ public class GameServiceImpl implements GameService {
                 .forEach((registrationId, moveUpdates) -> {
                     try {
                         moveUpdates.accept(move);
-                    } catch (Exception exception) {
+                    } catch (IOException e) {
                         this.unregisterForUpdates(registrationId);
                     }
                 });
@@ -154,7 +159,7 @@ public class GameServiceImpl implements GameService {
                 .forEach((registrationId, winnerUpdates) -> {
                     try {
                         winnerUpdates.accept(gameWinner);
-                    } catch (Exception exception) {
+                    } catch (IOException e) {
                         this.unregisterForUpdates(registrationId);
                     }
                 }));
@@ -182,8 +187,8 @@ public class GameServiceImpl implements GameService {
     @Override
     public String registerForUpdates(
         String gameId,
-        Consumer<Game.Move> moveUpdates,
-        Consumer<Game.Winner> winnerUpdates
+        ThrowableConsumer<Game.Move, IOException> moveUpdates,
+        ThrowableConsumer<Game.Winner, IOException> winnerUpdates
     ) throws ResourceNotFoundException {
         // Check that the game exists
         this.getGameById(gameId);
@@ -208,6 +213,8 @@ public class GameServiceImpl implements GameService {
         if (gameId != null) {
             this.moveUpdates.getOrDefault(gameId, new HashMap<>()).remove(registrationId);
             this.winnerUpdates.getOrDefault(gameId, new HashMap<>()).remove(registrationId);
+
+            logger.info("Unregistered for updates. gameId={}, registrationId={}", gameId, registrationId);
         }
     }
 

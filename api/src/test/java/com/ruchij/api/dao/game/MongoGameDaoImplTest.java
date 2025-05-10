@@ -279,6 +279,58 @@ class MongoGameDaoImplTest {
         Assertions.assertTrue(result.isEmpty());
     }
 
+    @Test
+    void getPendingGamesShouldOnlyReturnGamesWithNullGameStartedAt() {
+        // Insert pending games with gameStartedAt = null
+        List<String> pendingGameIds = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            String id = UUID.randomUUID().toString();
+            String name = "Pending Game " + faker.lorem().word();
+            Instant createdAt = Instant.now();
+            String createdBy = UUID.randomUUID().toString();
+
+            PendingGame pendingGame = new PendingGame(id, name, createdAt, createdBy, Optional.empty());
+            this.gameDao.insertPendingGame(pendingGame);
+            pendingGameIds.add(id);
+        }
+
+        // Insert pending games with gameStartedAt != null
+        List<String> startedGameIds = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            String id = UUID.randomUUID().toString();
+            String name = "Started Game " + faker.lorem().word();
+            Instant createdAt = Instant.now();
+            String createdBy = UUID.randomUUID().toString();
+            Instant gameStartedAt = Instant.now();
+
+            PendingGame pendingGame = new PendingGame(id, name, createdAt, createdBy, Optional.of(gameStartedAt));
+            this.gameDao.insertPendingGame(pendingGame);
+            startedGameIds.add(id);
+        }
+
+        // Get all pending games
+        List<PendingGame> result = this.gameDao.getPendingGames(10, 0);
+
+        // Verify that only games with gameStartedAt = null are returned
+        Assertions.assertEquals(3, result.size());
+
+        // Verify that all returned games have gameStartedAt = null
+        for (PendingGame game : result) {
+            Assertions.assertTrue(game.gameStartedAt().isEmpty());
+        }
+
+        // Verify that all pending game IDs are in the result
+        List<String> resultIds = result.stream().map(PendingGame::id).toList();
+        for (String id : pendingGameIds) {
+            Assertions.assertTrue(resultIds.contains(id));
+        }
+
+        // Verify that none of the started game IDs are in the result
+        for (String id : startedGameIds) {
+            Assertions.assertFalse(resultIds.contains(id));
+        }
+    }
+
     @AfterEach
     void tearDown() {
         this.mongoClient.close();

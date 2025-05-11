@@ -289,7 +289,12 @@ class GameServiceImplTest {
         // Arrange
         Game.Coordinate coordinate = new Game.Coordinate(0, 0);
         List<Game.Move> moves = new ArrayList<>();
-        Game.Winner winner = new Game.Winner(PLAYER_ONE_ID, Game.WinningRule.Horizontal);
+        List<Game.Coordinate> winningCoordinates = List.of(
+            new Game.Coordinate(0, 0),
+            new Game.Coordinate(1, 0),
+            new Game.Coordinate(2, 0)
+        );
+        Game.Winner winner = new Game.Winner(PLAYER_ONE_ID, Game.WinningRule.Horizontal, winningCoordinates);
 
         Game game = new Game(
             TEST_GAME_ID,
@@ -369,7 +374,12 @@ class GameServiceImplTest {
         // Arrange
         Game.Coordinate coordinate = new Game.Coordinate(0, 0);
         List<Game.Move> moves = new ArrayList<>();
-        Game.Winner winner = new Game.Winner(PLAYER_ONE_ID, Game.WinningRule.Horizontal);
+        List<Game.Coordinate> winningCoordinates = List.of(
+            new Game.Coordinate(0, 0),
+            new Game.Coordinate(1, 0),
+            new Game.Coordinate(2, 0)
+        );
+        Game.Winner winner = new Game.Winner(PLAYER_ONE_ID, Game.WinningRule.Horizontal, winningCoordinates);
 
         Game game = new Game(
             TEST_GAME_ID,
@@ -639,7 +649,12 @@ class GameServiceImplTest {
         moves.add(move);
 
         // Update the game with a winner
-        Game.Winner winner = new Game.Winner(PLAYER_ONE_ID, Game.WinningRule.Horizontal);
+        List<Game.Coordinate> winningCoordinates = List.of(
+            new Game.Coordinate(0, 0),
+            new Game.Coordinate(1, 0),
+            new Game.Coordinate(2, 0)
+        );
+        Game.Winner winner = new Game.Winner(PLAYER_ONE_ID, Game.WinningRule.Horizontal, winningCoordinates);
         Game updatedGame = new Game(
             TEST_GAME_ID,
             TEST_GAME_NAME,

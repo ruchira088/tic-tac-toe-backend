@@ -212,7 +212,12 @@ class MongoGameDaoImplTest {
         updatedMoves.add(move);
 
         // Add a winner
-        Game.Winner winner = new Game.Winner(playerOneId, Game.WinningRule.Diagonal);
+        List<Game.Coordinate> winningCoordinates = List.of(
+            new Game.Coordinate(0, 0),
+            new Game.Coordinate(1, 1),
+            new Game.Coordinate(2, 2)
+        );
+        Game.Winner winner = new Game.Winner(playerOneId, Game.WinningRule.Diagonal, winningCoordinates);
 
         Game updatedGame = new Game(id, title, createdAt, createdBy, startedAt, playerOneId, playerTwoId, updatedMoves, Optional.of(winner));
         Optional<Game> result = this.gameDao.updateGame(updatedGame);

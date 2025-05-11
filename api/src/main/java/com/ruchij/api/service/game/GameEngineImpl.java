@@ -69,7 +69,9 @@ public class GameEngineImpl implements GameEngine {
                     entry.getValue().stream().map(Game.Move::coordinate).collect(Collectors.toSet());
 
                 return isWinner(coordinates)
-                    .map(winningRule -> new Game.Winner(entry.getKey(), winningRule))
+                    .map(winningCondition ->
+                        new Game.Winner(entry.getKey(), winningCondition.winningRule, winningCondition.coordinates)
+                    )
                     .stream();
             })
             .findFirst();
@@ -77,29 +79,34 @@ public class GameEngineImpl implements GameEngine {
         return winner;
     }
 
-    Optional<Game.WinningRule> isWinner(Set<Game.Coordinate> coordinates) {
+    Optional<WinningCondition> isWinner(Set<Game.Coordinate> coordinates) {
         if (coordinates.size() >= gridSize) {
             for (Game.Coordinate baseCoordinate : coordinates) {
-                boolean isHorizontalWin =
-                    coordinates.stream()
-                        .filter(coordinate -> coordinate.y() == baseCoordinate.y())
-                        .count() == gridSize;
+                List<Game.Coordinate> sameHorizontalLineCoordinates = coordinates.stream()
+                    .filter(coordinate -> coordinate.y() == baseCoordinate.y())
+                    .sorted(Comparator.comparing(Game.Coordinate::x))
+                    .toList();
+
+                boolean isHorizontalWin = sameHorizontalLineCoordinates.size() == gridSize;
 
                 if (isHorizontalWin) {
-                    return Optional.of(Game.WinningRule.Horizontal);
+                    return Optional.of(WinningCondition.of(Game.WinningRule.Horizontal, sameHorizontalLineCoordinates));
                 }
 
-                boolean isVerticalWin =
+                List<Game.Coordinate> sameVerticalLineCoordinates =
                     coordinates.stream()
                         .filter(coordinate -> coordinate.x() == baseCoordinate.x())
-                        .count() == gridSize;
+                        .sorted(Comparator.comparing(Game.Coordinate::y))
+                        .toList();
+
+                boolean isVerticalWin = sameVerticalLineCoordinates.size() == gridSize;
 
                 if (isVerticalWin) {
-                    return Optional.of(Game.WinningRule.Vertical);
+                    return Optional.of(WinningCondition.of(Game.WinningRule.Vertical, sameVerticalLineCoordinates));
                 }
 
-                HashSet<Game.Coordinate> rightDiagonal = new HashSet<>();
-                HashSet<Game.Coordinate> leftDiagonal = new HashSet<>();
+                List<Game.Coordinate> rightDiagonal = new ArrayList<>(gridSize);
+                List<Game.Coordinate> leftDiagonal = new ArrayList<>(gridSize);
 
                 for (int i = 0; i < gridSize; i++) {
                     leftDiagonal.add(new Game.Coordinate(i, i));
@@ -107,15 +114,26 @@ public class GameEngineImpl implements GameEngine {
                 }
 
                 boolean isRightDiagonalWin = coordinates.containsAll(rightDiagonal);
+
+                if (isRightDiagonalWin) {
+                    return Optional.of(WinningCondition.of(Game.WinningRule.Diagonal, rightDiagonal));
+                }
+
                 boolean isLeftDiagonalWin = coordinates.containsAll(leftDiagonal);
 
-                if (isRightDiagonalWin || isLeftDiagonalWin) {
-                    return Optional.of(Game.WinningRule.Diagonal);
+                if (isLeftDiagonalWin) {
+                    return Optional.of(WinningCondition.of(Game.WinningRule.Diagonal, leftDiagonal));
                 }
             }
         }
 
         return Optional.empty();
+    }
+
+    record WinningCondition(Game.WinningRule winningRule, List<Game.Coordinate> coordinates) {
+        public static WinningCondition of(Game.WinningRule winningRule, List<Game.Coordinate> coordinates) {
+            return new WinningCondition(winningRule, coordinates);
+        }
     }
 
 }

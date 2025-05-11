@@ -5,6 +5,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public record Game(
     @BsonId
@@ -22,7 +23,7 @@ public record Game(
         Diagonal, Horizontal, Vertical
     }
 
-    public record Winner(String playerId, WinningRule winningRule) {
+    public record Winner(String playerId, WinningRule winningRule, List<Coordinate> coordinates) {
     }
 
     public record Coordinate(int x, int y) {

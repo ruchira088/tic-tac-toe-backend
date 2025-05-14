@@ -41,4 +41,9 @@ public class RandomGeneratorImpl implements RandomGenerator {
     public String password() {
         return this.faker.internet().password(10, 20, true, true, true);
     }
+
+    @Override
+    public boolean booleanValue() {
+        return this.faker.random().nextBoolean();
+    }
 }

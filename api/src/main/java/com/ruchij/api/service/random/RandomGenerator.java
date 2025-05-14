@@ -8,4 +8,6 @@ public interface RandomGenerator {
     UUID uuid();
 
     String password();
+
+    boolean booleanValue();
 }

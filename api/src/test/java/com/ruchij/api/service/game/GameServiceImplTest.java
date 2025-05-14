@@ -108,6 +108,7 @@ class GameServiceImplTest {
         when(gameDao.findPendingGameById(TEST_GAME_ID)).thenReturn(Optional.of(pendingGame));
         when(gameDao.updatePendingGame(any(PendingGame.class))).thenReturn(Optional.of(updatedPendingGame));
         when(gameDao.insertGame(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(randomGenerator.booleanValue()).thenReturn(true);
 
         // Act
         Game result = gameService.startGame(TEST_GAME_ID, PLAYER_TWO_ID);

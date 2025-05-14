@@ -86,14 +86,17 @@ public class GameServiceImpl implements GameService {
             );
         }
 
+        String playerOneId = this.randomGenerator.booleanValue() ? pendingGame.createdBy() : otherPlayerId;
+        String playerTwoId = playerOneId.equals(otherPlayerId) ? pendingGame.createdBy() : otherPlayerId;
+
         Game game = new Game(
             pendingGame.id(),
             pendingGame.title(),
             pendingGame.createdAt(),
-            pendingGame.createdBy(),
+            playerOneId,
             instant,
             pendingGame.createdBy(),
-            otherPlayerId,
+            playerTwoId,
             List.of(),
             Optional.empty()
         );

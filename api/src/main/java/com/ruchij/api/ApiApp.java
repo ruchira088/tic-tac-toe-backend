@@ -118,7 +118,7 @@ public class ApiApp {
         HealthService healthService = HealthServiceImpl.create(mongoDatabase, clock, properties);
 
         ScheduledExecutorService scheduledExecutorService =
-            Executors.newScheduledThreadPool(10, Thread.ofVirtual().factory());
+            Executors.newScheduledThreadPool(1000, Thread.ofVirtual().factory());
 
         return new Routes(
             userService,

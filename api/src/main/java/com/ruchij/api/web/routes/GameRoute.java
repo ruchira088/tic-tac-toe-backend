@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +33,7 @@ public class GameRoute implements EndpointGroup {
     private final Authenticator authenticator;
     private final ScheduledExecutorService scheduledExecutorService;
     private final Clock clock;
+    private final Map<String, ScheduledFuture<?>> pingScheduledFutures = new ConcurrentHashMap<>();
 
     public GameRoute(
         GameService gameService,
@@ -104,25 +108,6 @@ public class GameRoute implements EndpointGroup {
                     User user = this.authenticator.authenticate(wsConnectContext);
                     String gameId = wsConnectContext.pathParam("gameId");
 
-                    logger.info("userId={} connected to game updates for gameId={}", user.id(), gameId);
-
-                    ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
-                        () -> {
-                            logger.info("userId={} pinged game updates for gameId={}", user.id(), gameId);
-                            wsConnectContext.send(
-                                new WebSocketResponse<>(WebSocketResponse.Type.PING,
-                                    new WebSocketResponse.Ping(
-                                        user.id(),
-                                        user.username(),
-                                        this.clock.instant()
-                                    )
-                                ));
-                        },
-                        0,
-                        10,
-                        TimeUnit.SECONDS
-                    );
-
                     String registrationId =
                         this.gameService.registerForUpdates(
                             gameId,
@@ -134,10 +119,49 @@ public class GameRoute implements EndpointGroup {
                             }
                         );
 
-                    ws.onClose(wsCloseContext -> {
+                    Runnable closeConnection = () -> {
                         logger.info("userId={} disconnected from game updates for gameId={}", user.id(), gameId);
                         this.gameService.unregisterForUpdates(registrationId);
-                        scheduledFuture.cancel(true);
+                        Optional.ofNullable(pingScheduledFutures.remove(registrationId))
+                            .ifPresent(scheduledFuture -> {
+                                scheduledFuture.cancel(false);
+                            });
+                        wsConnectContext.closeSession();
+                    };
+
+                    logger.info("userId={} connected to game updates for gameId={}", user.id(), gameId);
+
+                    ScheduledFuture<?> pingScheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
+                        () -> {
+                            logger.info("userId={} pinged game updates for gameId={}", user.id(), gameId);
+                            try {
+                                wsConnectContext.send(
+                                    new WebSocketResponse<>(WebSocketResponse.Type.PING,
+                                        new WebSocketResponse.Ping(
+                                            user.id(),
+                                            user.username(),
+                                            this.clock.instant()
+                                        )
+                                    ));
+                            } catch (Exception e) {
+                                logger.error("Error sending ping for userId={} and gameId={}", user.id(), gameId, e);
+                                closeConnection.run();
+                            }
+                        },
+                        0,
+                        10,
+                        TimeUnit.SECONDS
+                    );
+
+                    pingScheduledFutures.put(registrationId, pingScheduledFuture);
+
+                    ws.onError(wsErrorContext -> {
+                        logger.error("Error in game updates for userId={} and gameId={}", user.id(), gameId, wsErrorContext.error());
+                        closeConnection.run();
+                    });
+
+                    ws.onClose(wsCloseContext -> {
+                        closeConnection.run();
                     });
                 });
             });

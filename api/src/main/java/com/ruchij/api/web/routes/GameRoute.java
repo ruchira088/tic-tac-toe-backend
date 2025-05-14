@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,6 +107,8 @@ public class GameRoute implements EndpointGroup {
 
             ws("/updates", ws -> {
                 ws.onConnect(wsConnectContext -> {
+                    wsConnectContext.session.setIdleTimeout(Duration.of(30, ChronoUnit.MINUTES));
+
                     User user = this.authenticator.authenticate(wsConnectContext);
                     String gameId = wsConnectContext.pathParam("gameId");
 

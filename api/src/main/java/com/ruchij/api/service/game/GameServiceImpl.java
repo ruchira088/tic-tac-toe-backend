@@ -142,28 +142,43 @@ public class GameServiceImpl implements GameService {
                 )
             );
 
-        this.executorService.submit(() -> {
-            this.moveUpdates.getOrDefault(gameId, new HashMap<>())
-                .forEach((registrationId, moveUpdates) -> {
-                    try {
-                        moveUpdates.accept(move);
-                    } catch (IOException e) {
-                        this.unregisterForUpdates(registrationId);
+        this.moveUpdates.getOrDefault(gameId, new HashMap<>())
+            .forEach((registrationId, moveUpdates) ->
+                this.executorService.submit(() -> {
+                        try {
+                            moveUpdates.accept(move);
+                        } catch (IOException e) {
+                            this.unregisterForUpdates(registrationId);
+                        } catch (Exception e) {
+                            logger.error(
+                                "Error notifying for move updates. gameId=%s, registrationId=%s".formatted(gameId, registrationId),
+                                e
+                            );
+                            this.unregisterForUpdates(registrationId);
+                        }
                     }
-                });
-        });
+                )
+            );
 
-
-        this.executorService.submit(() -> {
-            winner.ifPresent(gameWinner -> this.winnerUpdates.getOrDefault(gameId, new HashMap<>())
-                .forEach((registrationId, winnerUpdates) -> {
-                    try {
-                        winnerUpdates.accept(gameWinner);
-                    } catch (IOException e) {
-                        this.unregisterForUpdates(registrationId);
-                    }
-                }));
-        });
+        winner.ifPresent(gameWinner ->
+            this.winnerUpdates.getOrDefault(gameId, new HashMap<>())
+                .forEach((registrationId, winnerUpdates) ->
+                    this.executorService.submit(() -> {
+                            try {
+                                winnerUpdates.accept(gameWinner);
+                            } catch (IOException e) {
+                                this.unregisterForUpdates(registrationId);
+                            } catch (Exception e) {
+                                logger.error(
+                                    "Error notifying for winner updates. gameId=%s, registrationId=%s".formatted(gameId, registrationId),
+                                    e
+                                );
+                                this.unregisterForUpdates(registrationId);
+                            }
+                        }
+                    )
+                )
+        );
 
         return updatedGame;
     }

@@ -279,9 +279,6 @@ class GameServiceImplTest {
         assertEquals(FIXED_INSTANT, capturedGame.moves().getFirst().performedAt());
         assertEquals(coordinate, capturedGame.moves().getFirst().coordinate());
         assertTrue(capturedGame.winner().isEmpty());
-
-        // Verify executorService was called to notify listeners
-        verify(executorService, times(2)).submit(any(Runnable.class));
     }
 
     @Test
@@ -345,9 +342,6 @@ class GameServiceImplTest {
         assertTrue(capturedGame.winner().isPresent());
         assertEquals(PLAYER_ONE_ID, capturedGame.winner().get().playerId());
         assertEquals(Game.WinningRule.Horizontal, capturedGame.winner().get().winningRule());
-
-        // Verify executorService was called to notify listeners
-        verify(executorService, times(2)).submit(any(Runnable.class));
     }
 
     @Test

@@ -11,6 +11,8 @@ import com.ruchij.api.web.responses.PaginatedResponse;
 import com.ruchij.api.web.responses.WebSocketResponse;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.List;
@@ -22,6 +24,8 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.ws;
 
 public class GameRoute implements EndpointGroup {
+    private static final Logger logger = LoggerFactory.getLogger(GameRoute.class);
+
     private final GameService gameService;
     private final Authenticator authenticator;
     private final ScheduledExecutorService scheduledExecutorService;
@@ -98,8 +102,9 @@ public class GameRoute implements EndpointGroup {
             ws("/updates", ws -> {
                 ws.onConnect(wsConnectContext -> {
                     User user = this.authenticator.authenticate(wsConnectContext);
-
                     String gameId = wsConnectContext.pathParam("gameId");
+
+                    logger.info("userId={} connected to game updates for gameId={}", user.id(), gameId);
 
                     ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
                         () -> {
@@ -112,8 +117,8 @@ public class GameRoute implements EndpointGroup {
                                     )
                                 ));
                         },
-                        5,
-                        20,
+                        0,
+                        10,
                         TimeUnit.SECONDS
                     );
 
@@ -129,6 +134,7 @@ public class GameRoute implements EndpointGroup {
                         );
 
                     ws.onClose(wsCloseContext -> {
+                        logger.info("userId={} disconnected from game updates for gameId={}", user.id(), gameId);
                         this.gameService.unregisterForUpdates(registrationId);
                         scheduledFuture.cancel(true);
                     });

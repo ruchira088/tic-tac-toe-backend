@@ -124,8 +124,15 @@ public class GameRoute implements EndpointGroup {
                         );
 
                     Runnable closeConnection = () -> {
-                        logger.info("userId={} disconnected from game updates for gameId={}", user.id(), gameId);
+                        logger.info(
+                            "userId={} disconnected from game updates for gameId={} registrationId={}",
+                            user.id(),
+                            gameId,
+                            registrationId
+                        );
+
                         this.gameService.unregisterForUpdates(registrationId);
+
                         Optional.ofNullable(pingScheduledFutures.remove(registrationId))
                             .ifPresent(scheduledFuture -> {
                                 scheduledFuture.cancel(false);
@@ -133,11 +140,22 @@ public class GameRoute implements EndpointGroup {
                         wsConnectContext.closeSession();
                     };
 
-                    logger.info("userId={} connected to game updates for gameId={}", user.id(), gameId);
+                    logger.info(
+                        "userId={} connected to game updates for gameId={} registrationId={}",
+                        user.id(),
+                        gameId,
+                        registrationId
+                    );
 
                     ScheduledFuture<?> pingScheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
                         () -> {
-                            logger.info("userId={} pinged game updates for gameId={}", user.id(), gameId);
+                            logger.info(
+                                "Sending ping for userId={} gameId={} registrationId={}",
+                                user.id(),
+                                gameId,
+                                registrationId
+                            );
+
                             try {
                                 wsConnectContext.send(
                                     new WebSocketResponse<>(WebSocketResponse.Type.PING,
@@ -147,8 +165,20 @@ public class GameRoute implements EndpointGroup {
                                             this.clock.instant()
                                         )
                                     ));
+                                logger.info(
+                                    "Sent ping for userId={} gameId={} registrationId={}",
+                                    user.id(),
+                                    gameId,
+                                    registrationId
+                                );
                             } catch (Exception e) {
-                                logger.error("Error sending ping for userId={} and gameId={}", user.id(), gameId, e);
+                                logger.error(
+                                    "Error sending ping for userId={} gameId={} registrationId={}",
+                                    user.id(),
+                                    gameId,
+                                    registrationId,
+                                    e
+                                );
                                 closeConnection.run();
                             }
                         },
@@ -160,7 +190,14 @@ public class GameRoute implements EndpointGroup {
                     pingScheduledFutures.put(registrationId, pingScheduledFuture);
 
                     ws.onError(wsErrorContext -> {
-                        logger.error("Error in game updates for userId={} and gameId={}", user.id(), gameId, wsErrorContext.error());
+                        logger.error(
+                            "Error in game updates for userId={} gameId={} registrationId={}",
+                            user.id(),
+                            gameId,
+                            registrationId,
+                            wsErrorContext.error()
+                        );
+
                         closeConnection.run();
                     });
 

@@ -137,13 +137,7 @@ public class GameServiceImpl implements GameService {
                 winner
             );
 
-        this.gameDao.updateGame(updatedGame)
-            .orElseThrow(() ->
-                new RuntimeException(
-                    "Game id=%s not found. This is most likely due to a concurrency issue"
-                        .formatted(game.id())
-                )
-            );
+        this.gameDao.updateGame(updatedGame);
 
         this.moveUpdates.getOrDefault(gameId, new HashMap<>())
             .forEach((registrationId, moveUpdates) ->

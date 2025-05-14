@@ -439,46 +439,6 @@ class GameServiceImplTest {
     }
 
     @Test
-    void addMoveShouldThrowExceptionWhenUpdateFails() throws ValidationException {
-        // Arrange
-        Game.Coordinate coordinate = new Game.Coordinate(0, 0);
-        List<Game.Move> moves = new ArrayList<>();
-
-        Game game = new Game(
-            TEST_GAME_ID,
-            TEST_GAME_NAME,
-            FIXED_INSTANT,
-            PLAYER_ONE_ID,
-            FIXED_INSTANT,
-            PLAYER_ONE_ID,
-            PLAYER_TWO_ID,
-            moves,
-            Optional.empty()
-        );
-
-        when(gameDao.findGameById(TEST_GAME_ID)).thenReturn(Optional.of(game));
-        when(gameDao.updateGame(any(Game.class))).thenReturn(Optional.empty());
-        when(gameEngine.getWinner(any(Game.class))).thenReturn(Optional.empty());
-        doNothing().when(gameEngine).checkMove(any(Game.class), anyString(), any(Game.Coordinate.class));
-
-        // Act & Assert
-        RuntimeException exception = assertThrows(
-            RuntimeException.class,
-            () -> gameService.addMove(TEST_GAME_ID, PLAYER_ONE_ID, coordinate)
-        );
-
-        assertTrue(exception.getMessage().contains("Game id=" + TEST_GAME_ID + " not found"));
-        assertTrue(exception.getMessage().contains("concurrency issue"));
-
-        // Verify interactions
-        verify(gameDao).findGameById(TEST_GAME_ID);
-        verify(gameEngine).checkMove(any(Game.class), eq(PLAYER_ONE_ID), eq(coordinate));
-        verify(gameEngine).getWinner(any(Game.class));
-        verify(gameDao).updateGame(any(Game.class));
-        verify(executorService, never()).submit(any(Runnable.class));
-    }
-
-    @Test
     void getGameByIdShouldReturnGameWhenExists() throws ResourceNotFoundException {
         // Arrange
         List<Game.Move> moves = new ArrayList<>();

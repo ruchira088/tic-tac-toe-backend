@@ -37,10 +37,15 @@ public class MongoGameDaoImpl implements GameDao {
         UpdateResult updateResult =
             this.pendingGamesCollection.replaceOne(Filters.eq("_id", pendingGame.id()), mongoPendingGame);
 
-        if (updateResult.getModifiedCount() > 0) {
+
+        if (updateResult.getMatchedCount() == 1) {
             return Optional.of(pendingGame);
-        } else {
+        } else if (updateResult.getMatchedCount() == 0) {
             return Optional.empty();
+        } else {
+            throw new IllegalStateException(
+                "More than one pending game was updated."
+            );
         }
     }
 

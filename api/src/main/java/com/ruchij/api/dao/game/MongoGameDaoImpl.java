@@ -38,9 +38,9 @@ public class MongoGameDaoImpl implements GameDao {
             this.pendingGamesCollection.replaceOne(Filters.eq("_id", pendingGame.id()), mongoPendingGame);
 
 
-        if (updateResult.getMatchedCount() == 1) {
+        if (updateResult.getModifiedCount() == 1) {
             return Optional.of(pendingGame);
-        } else if (updateResult.getMatchedCount() == 0) {
+        } else if (updateResult.getModifiedCount() == 0) {
             return Optional.empty();
         } else {
             throw new IllegalStateException(

@@ -64,7 +64,7 @@ public class GameServiceImpl implements GameService {
             );
 
         if (pendingGame.gameStartedAt().isPresent()) {
-            throw new ResourceConflictException("Game has already started");
+            throw new ResourceConflictException("PendingGame has already started");
         }
 
         Instant instant = this.clock.instant();
@@ -80,10 +80,7 @@ public class GameServiceImpl implements GameService {
         Optional<PendingGame> updatedGame = this.gameDao.updatePendingGame(updatedPendingGame);
 
         if (updatedGame.isEmpty()) {
-            throw new RuntimeException(
-                "Pending game id=%s not found. This is most likely due to a concurrency issue"
-                    .formatted(pendingGame.id())
-            );
+            throw new ResourceConflictException("PendingGame had no updates");
         }
 
         String playerOneId = this.randomGenerator.booleanValue() ? pendingGame.createdBy() : otherPlayerId;

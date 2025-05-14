@@ -108,6 +108,7 @@ public class GameRoute implements EndpointGroup {
 
                     ScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleAtFixedRate(
                         () -> {
+                            logger.info("userId={} pinged game updates for gameId={}", user.id(), gameId);
                             wsConnectContext.send(
                                 new WebSocketResponse<>(WebSocketResponse.Type.PING,
                                     new WebSocketResponse.Ping(

@@ -93,9 +93,9 @@ public class GameServiceImpl implements GameService {
             pendingGame.id(),
             pendingGame.title(),
             pendingGame.createdAt(),
-            playerOneId,
-            instant,
             pendingGame.createdBy(),
+            instant,
+            playerOneId,
             playerTwoId,
             List.of(),
             Optional.empty()

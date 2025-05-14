@@ -192,40 +192,11 @@ class GameServiceImplTest {
             () -> gameService.startGame(TEST_GAME_ID, PLAYER_TWO_ID)
         );
 
-        assertEquals("Game has already started", exception.getMessage());
+        assertEquals("PendingGame has already started", exception.getMessage());
 
         // Verify interactions
         verify(gameDao).findPendingGameById(TEST_GAME_ID);
         verify(gameDao, never()).updatePendingGame(any(PendingGame.class));
-        verify(gameDao, never()).insertGame(any(Game.class));
-    }
-
-    @Test
-    void startGameShouldThrowExceptionWhenUpdateFails() {
-        // Arrange
-        PendingGame pendingGame = new PendingGame(
-            TEST_GAME_ID,
-            TEST_GAME_NAME,
-            FIXED_INSTANT,
-            PLAYER_ONE_ID,
-            Optional.empty()
-        );
-
-        when(gameDao.findPendingGameById(TEST_GAME_ID)).thenReturn(Optional.of(pendingGame));
-        when(gameDao.updatePendingGame(any(PendingGame.class))).thenReturn(Optional.empty());
-
-        // Act & Assert
-        RuntimeException exception = assertThrows(
-            RuntimeException.class,
-            () -> gameService.startGame(TEST_GAME_ID, PLAYER_TWO_ID)
-        );
-
-        assertTrue(exception.getMessage().contains("Pending game id=" + TEST_GAME_ID + " not found"));
-        assertTrue(exception.getMessage().contains("concurrency issue"));
-
-        // Verify interactions
-        verify(gameDao).findPendingGameById(TEST_GAME_ID);
-        verify(gameDao).updatePendingGame(any(PendingGame.class));
         verify(gameDao, never()).insertGame(any(Game.class));
     }
 

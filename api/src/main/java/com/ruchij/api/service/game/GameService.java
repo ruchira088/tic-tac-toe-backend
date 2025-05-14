@@ -35,4 +35,8 @@ public interface GameService {
     void unregisterForUpdates(String registrationId);
 
     List<PendingGame> getPendingGames(int limit, int offset);
+
+    List<Game> getUnfinishedGamesByPlayerId(String playerId, int limit, int offset);
+
+    List<PendingGame> getPendingGamesByPlayerId(String playerId, int limit, int offset);
 }

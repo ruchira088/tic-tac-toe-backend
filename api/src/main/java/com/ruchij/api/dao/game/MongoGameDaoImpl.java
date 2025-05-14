@@ -3,6 +3,7 @@ package com.ruchij.api.dao.game;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import com.ruchij.api.dao.game.models.Game;
@@ -72,6 +73,26 @@ public class MongoGameDaoImpl implements GameDao {
     }
 
     @Override
+    public List<Game> findGamesByPlayerId(String playerId, int limit, int offset) {
+        ArrayList<MongoGame> unfinishedGames = this.gamesCollection
+            .find(
+                Filters.and(
+                    Filters.or(
+                        Filters.eq("playerOneId", playerId),
+                        Filters.eq("playerTwoId", playerId)
+                    ),
+                    Filters.eq("winner", null)
+                )
+            )
+            .sort(Sorts.descending("createdAt"))
+            .skip(offset)
+            .limit(limit)
+            .into(new ArrayList<>());
+
+        return unfinishedGames.stream().map(MongoGame::toGame).toList();
+    }
+
+    @Override
     public Optional<Game> updateGame(Game game) {
         UpdateResult updateResult = this.gamesCollection.replaceOne(
             Filters.eq("_id", game.id()),
@@ -90,6 +111,20 @@ public class MongoGameDaoImpl implements GameDao {
         List<MongoPendingGame> mongoPendingGames =
             this.pendingGamesCollection
                 .find(Filters.eq("gameStartedAt", null))
+                .sort(Sorts.descending("createdAt"))
+                .skip(offset)
+                .limit(limit)
+                .into(new ArrayList<>());
+
+        return mongoPendingGames.stream().map(MongoPendingGame::toPendingGame).toList();
+    }
+
+    @Override
+    public List<PendingGame> getPendingGamesByPlayerId(String playerId, int limit, int offset) {
+        List<MongoPendingGame> mongoPendingGames =
+            this.pendingGamesCollection
+                .find(Filters.eq("createdBy", playerId))
+                .sort(Sorts.descending("createdAt"))
                 .skip(offset)
                 .limit(limit)
                 .into(new ArrayList<>());

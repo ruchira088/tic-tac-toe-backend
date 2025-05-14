@@ -69,6 +69,19 @@ public class GameRoute implements EndpointGroup {
                 context.status(HttpStatus.OK).json(new PaginatedResponse<>(pendingGames, offset, limit));
             });
 
+            path("/user", () -> {
+                this.authenticator.get((user, context) -> {
+                    int offset = context.queryParamAsClass("offset", Integer.class).getOrDefault(0);
+                    int limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
+
+                    List<PendingGame> pendingGames =
+                        this.gameService.getPendingGamesByPlayerId(user.id(), limit, offset);
+
+                    context.status(HttpStatus.OK)
+                        .json(new PaginatedResponse<>(pendingGames, offset, limit));
+                });
+            });
+
             path("/id/{gameId}", () -> {
                 this.authenticator.get((user, context) -> {
                     String gameId = context.pathParam("gameId");
@@ -85,6 +98,18 @@ public class GameRoute implements EndpointGroup {
 
                     context.status(HttpStatus.OK).json(game);
                 });
+            });
+        });
+
+        path("/user", () -> {
+            this.authenticator.get((user, context) -> {
+                int offset = context.queryParamAsClass("offset", Integer.class).getOrDefault(0);
+                int limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
+
+                List<Game> games = this.gameService.getUnfinishedGamesByPlayerId(user.id(), limit, offset);
+
+                context.status(HttpStatus.OK)
+                    .json(new PaginatedResponse<>(games, offset, limit));
             });
         });
 

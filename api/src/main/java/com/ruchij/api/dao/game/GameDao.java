@@ -19,5 +19,9 @@ public interface GameDao {
 
     Optional<Game> updateGame(Game game);
 
+    List<Game> findGamesByPlayerId(String playerId, int limit, int offset);
+
     List<PendingGame> getPendingGames(int limit, int offset);
+
+    List<PendingGame> getPendingGamesByPlayerId(String playerId, int limit, int offset);
 }

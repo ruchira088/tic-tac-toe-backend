@@ -231,4 +231,14 @@ public class GameServiceImpl implements GameService {
     public List<PendingGame> getPendingGames(int limit, int offset) {
         return this.gameDao.getPendingGames(limit, offset);
     }
+
+    @Override
+    public List<Game> getUnfinishedGamesByPlayerId(String playerId, int limit, int offset) {
+        return this.gameDao.findGamesByPlayerId(playerId, limit, offset);
+    }
+
+    @Override
+    public List<PendingGame> getPendingGamesByPlayerId(String playerId, int limit, int offset) {
+        return this.gameDao.getPendingGamesByPlayerId(playerId, limit, offset);
+    }
 }

@@ -115,8 +115,8 @@ public class GameServiceImpl implements GameService {
         this.gameEngine.checkMove(game, playerId, coordinate);
 
         Instant instant = this.clock.instant();
-
-        Game.Move move = new Game.Move(playerId, instant, coordinate);
+        String moveId = this.randomGenerator.uuid().toString();
+        Game.Move move = new Game.Move(moveId, playerId, instant, coordinate);
         game.moves().add(move);
 
         Optional<Game.Winner> winner = this.gameEngine.getWinner(game);

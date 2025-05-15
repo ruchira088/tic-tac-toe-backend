@@ -36,7 +36,9 @@ public class UserRoute implements EndpointGroup {
 
             AuthToken authToken = this.authenticationService.createAuthToken(user.id());
 
-            context.status(HttpStatus.CREATED).json(new UserRegistrationResponse(authToken, user));
+            context.status(HttpStatus.CREATED)
+                .cookie(Authenticator.COOKIE_NAME, authToken.token())
+                .json(new UserRegistrationResponse(authToken, user));
         });
 
         this.authenticator.get((user, context) -> {
@@ -47,7 +49,9 @@ public class UserRoute implements EndpointGroup {
             User user = this.userService.registerUser();
             AuthToken authToken = this.authenticationService.createAuthToken(user.id());
 
-            context.status(HttpStatus.CREATED).json(new UserRegistrationResponse(authToken, user));
+            context.status(HttpStatus.CREATED)
+                .cookie(Authenticator.COOKIE_NAME, authToken.token())
+                .json(new UserRegistrationResponse(authToken, user));
         });
     }
 }

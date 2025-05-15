@@ -31,7 +31,10 @@ public class AuthRoute implements EndpointGroup {
             String authToken = Authenticator.getToken(context);
             User user = this.authenticationService.removeAuthToken(authToken);
 
-            context.status(200).json(user);
+            context
+                .status(200)
+                .removeCookie(Authenticator.COOKIE_NAME)
+                .json(user);
         });
     }
 }

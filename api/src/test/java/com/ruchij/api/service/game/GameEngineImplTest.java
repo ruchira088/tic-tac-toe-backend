@@ -6,14 +6,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 class GameEngineImplTest {
     private static final GameEngineImpl gameEngineImpl = new GameEngineImpl();
     private static final GameEngineImpl gameEngineImpl4x4 = new GameEngineImpl(4);
+
+    private String moveId() {
+        return UUID.randomUUID().toString();
+    }
 
     @Test
     void isHorizontalWinner() {
@@ -388,8 +389,8 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",
@@ -424,8 +425,8 @@ class GameEngineImplTest {
         String player3Id = "player3";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",
@@ -460,8 +461,8 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",
@@ -496,8 +497,8 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",
@@ -532,8 +533,8 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",
@@ -568,11 +569,11 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 0)));
 
         Game game = new Game(
             "game-id",
@@ -611,11 +612,11 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 0)));
 
         Game game = new Game(
             "game-id",
@@ -659,11 +660,11 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 2)));
 
         Game game = new Game(
             "game-id",
@@ -707,11 +708,11 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",
@@ -755,11 +756,11 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 2)));
 
         Game game = new Game(
             "game-id",
@@ -803,13 +804,13 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 2)));
 
         Game game = new Game(
             "game-id",
@@ -842,15 +843,15 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 2)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 2)));
 
         Game game = new Game(
             "game-id",
@@ -894,13 +895,13 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(3, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(3, 0)));
 
         Game game = new Game(
             "game-id",
@@ -936,13 +937,13 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 2)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 3)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 2)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 3)));
 
         Game game = new Game(
             "game-id",
@@ -978,13 +979,13 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 1)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 2)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(3, 3)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 1)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(3, 3)));
 
         Game game = new Game(
             "game-id",
@@ -1020,13 +1021,13 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(3, 0)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(0, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(2, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(1, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 2)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 0)));
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(0, 3)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(3, 0)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(0, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(2, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(1, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 2)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 0)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(0, 3)));
 
         Game game = new Game(
             "game-id",
@@ -1062,8 +1063,8 @@ class GameEngineImplTest {
         String player2Id = "player2";
 
         List<Game.Move> moves = new ArrayList<>();
-        moves.add(new Game.Move(player1Id, Instant.now(), new Game.Coordinate(1, 1)));
-        moves.add(new Game.Move(player2Id, Instant.now(), new Game.Coordinate(2, 2)));
+        moves.add(new Game.Move(moveId(), player1Id, Instant.now(), new Game.Coordinate(1, 1)));
+        moves.add(new Game.Move(moveId(), player2Id, Instant.now(), new Game.Coordinate(2, 2)));
 
         Game game = new Game(
             "game-id",

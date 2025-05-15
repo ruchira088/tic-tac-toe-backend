@@ -207,7 +207,7 @@ class MongoGameDaoImplTest {
 
         // Add a move
         Game.Coordinate coordinate = new Game.Coordinate(0, 0);
-        Game.Move move = new Game.Move(playerOneId, Instant.now(), coordinate);
+        Game.Move move = new Game.Move("move-id", playerOneId, Instant.now(), coordinate);
         List<Game.Move> updatedMoves = new ArrayList<>(moves);
         updatedMoves.add(move);
 

@@ -28,6 +28,6 @@ public record Game(
     public record Coordinate(int x, int y) {
     }
 
-    public record Move(String playerId, Instant performedAt, Coordinate coordinate) {
+    public record Move(String id, String playerId, Instant performedAt, Coordinate coordinate) {
     }
 }

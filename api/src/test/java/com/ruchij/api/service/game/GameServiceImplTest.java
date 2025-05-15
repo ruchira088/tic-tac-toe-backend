@@ -569,7 +569,7 @@ class GameServiceImplTest {
 
         // Create a move
         Game.Coordinate coordinate = new Game.Coordinate(0, 0);
-        Game.Move move = new Game.Move(PLAYER_ONE_ID, FIXED_INSTANT, coordinate);
+        Game.Move move = new Game.Move("move-id", PLAYER_ONE_ID, FIXED_INSTANT, coordinate);
 
         // Add the move to the game
         moves.add(move);

@@ -42,3 +42,22 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: tic-tac-toe
+
+  tic-tac-toe-front-end:
+    image: ghcr.io/ruchira088/tic-tac-toe-front-end:main
+#    healthcheck:
+#      test: [
+#        "CMD",
+#        "curl",
+#        "--fail",
+#        "http://localhost:3000/service/health"
+#      ]
+#      interval: 10s
+#      timeout: 8s
+#      retries: 1
+#      start_period: 10s
+    depends_on:
+      tic-tac-toe-bankend:
+        condition: service_healthy
+    ports:
+      - "80:80"

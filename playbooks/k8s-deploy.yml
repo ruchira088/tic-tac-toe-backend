@@ -15,8 +15,7 @@
     - name: Render K8s resource files
       import_tasks: tasks/k8s-resource-files.yml
       vars:
-        domain: api.tic-tac-toe.home.ruchij.com
-        hostname: "{{ domain if git_branch == 'main' else git_branch + '.' + domain }}"
+        hostname: "{{ 'api.tic-tac-toe.home.ruchij.com' if git_branch == 'main' else 'api.' + git_branch + '.tic-tac-toe.home.ruchij.com' }}"
         ghcr_credentials: "{{ lookup('aws_ssm', '/github/ghcr/docker-config', region='ap-southeast-2') }}"
 
     - name: Set kube_config

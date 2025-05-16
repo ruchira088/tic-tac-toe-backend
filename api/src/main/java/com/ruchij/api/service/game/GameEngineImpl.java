@@ -116,7 +116,7 @@ public class GameEngineImpl implements GameEngine {
                 boolean isRightDiagonalWin = coordinates.containsAll(backDiagonal);
 
                 if (isRightDiagonalWin) {
-                    return Optional.of(WinningCondition.of(Game.WinningRule.BackDiagonal, backDiagonal));
+                    return Optional.of(WinningCondition.of(Game.WinningRule.BackwardDiagonal, backDiagonal));
                 }
 
                 boolean isLeftDiagonalWin = coordinates.containsAll(forwardDiagonal);

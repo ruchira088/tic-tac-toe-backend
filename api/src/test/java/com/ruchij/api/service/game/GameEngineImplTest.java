@@ -282,7 +282,7 @@ class GameEngineImplTest {
             )
         );
         Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals(Game.WinningRule.BackDiagonal, result.get().winningRule());
+        Assertions.assertEquals(Game.WinningRule.BackwardDiagonal, result.get().winningRule());
         Assertions.assertEquals(
             List.of(
                 new Game.Coordinate(0, 0),
@@ -307,7 +307,7 @@ class GameEngineImplTest {
             )
         );
         Assertions.assertTrue(result2.isPresent());
-        Assertions.assertEquals(Game.WinningRule.BackDiagonal, result2.get().winningRule());
+        Assertions.assertEquals(Game.WinningRule.BackwardDiagonal, result2.get().winningRule());
         Assertions.assertEquals(
             List.of(
                 new Game.Coordinate(0, 0),
@@ -730,7 +730,7 @@ class GameEngineImplTest {
 
         Assertions.assertTrue(winner.isPresent());
         Assertions.assertEquals(player1Id, winner.get().playerId());
-        Assertions.assertEquals(Game.WinningRule.BackDiagonal, winner.get().winningRule());
+        Assertions.assertEquals(Game.WinningRule.BackwardDiagonal, winner.get().winningRule());
 
         // Verify winning coordinates
         List<Game.Coordinate> expectedCoordinates = List.of(
@@ -1003,7 +1003,7 @@ class GameEngineImplTest {
 
         Assertions.assertTrue(winner.isPresent());
         Assertions.assertEquals(player1Id, winner.get().playerId());
-        Assertions.assertEquals(Game.WinningRule.BackDiagonal, winner.get().winningRule());
+        Assertions.assertEquals(Game.WinningRule.BackwardDiagonal, winner.get().winningRule());
     }
 
     @Test

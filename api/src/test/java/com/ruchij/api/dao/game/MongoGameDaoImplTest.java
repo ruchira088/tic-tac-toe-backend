@@ -217,7 +217,7 @@ class MongoGameDaoImplTest {
             new Game.Coordinate(1, 1),
             new Game.Coordinate(2, 2)
         );
-        Game.Winner winner = new Game.Winner(playerOneId, Game.WinningRule.Diagonal, winningCoordinates);
+        Game.Winner winner = new Game.Winner(playerOneId, Game.WinningRule.ForwardDiagonal, winningCoordinates);
 
         Game updatedGame = new Game(id, title, createdAt, createdBy, startedAt, playerOneId, playerTwoId, updatedMoves, Optional.of(winner));
         Optional<Game> result = this.gameDao.updateGame(updatedGame);
@@ -234,7 +234,7 @@ class MongoGameDaoImplTest {
         Assertions.assertEquals(1, result.get().moves().size());
         Assertions.assertEquals(coordinate, result.get().moves().get(0).coordinate());
         Assertions.assertEquals(playerOneId, result.get().winner().get().playerId());
-        Assertions.assertEquals(Game.WinningRule.Diagonal, result.get().winner().get().winningRule());
+        Assertions.assertEquals(Game.WinningRule.ForwardDiagonal, result.get().winner().get().winningRule());
     }
 
     @Test

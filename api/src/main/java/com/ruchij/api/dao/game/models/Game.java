@@ -19,7 +19,7 @@ public record Game(
     Optional<Winner> winner
 ) {
     public enum WinningRule {
-        Diagonal, Horizontal, Vertical
+        BackDiagonal, ForwardDiagonal, Horizontal, Vertical
     }
 
     public record Winner(String playerId, WinningRule winningRule, List<Coordinate> coordinates) {

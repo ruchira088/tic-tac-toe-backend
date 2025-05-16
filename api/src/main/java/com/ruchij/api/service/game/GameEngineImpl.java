@@ -105,24 +105,24 @@ public class GameEngineImpl implements GameEngine {
                     return Optional.of(WinningCondition.of(Game.WinningRule.Vertical, sameVerticalLineCoordinates));
                 }
 
-                List<Game.Coordinate> rightDiagonal = new ArrayList<>(gridSize);
-                List<Game.Coordinate> leftDiagonal = new ArrayList<>(gridSize);
+                List<Game.Coordinate> backDiagonal = new ArrayList<>(gridSize);
+                List<Game.Coordinate> forwardDiagonal = new ArrayList<>(gridSize);
 
                 for (int i = 0; i < gridSize; i++) {
-                    leftDiagonal.add(new Game.Coordinate(i, i));
-                    rightDiagonal.add(new Game.Coordinate(gridSize - 1 - i, i));
+                    backDiagonal.add(new Game.Coordinate(i, i));
+                    forwardDiagonal.add(new Game.Coordinate(gridSize - 1 - i, i));
                 }
 
-                boolean isRightDiagonalWin = coordinates.containsAll(rightDiagonal);
+                boolean isRightDiagonalWin = coordinates.containsAll(backDiagonal);
 
                 if (isRightDiagonalWin) {
-                    return Optional.of(WinningCondition.of(Game.WinningRule.Diagonal, rightDiagonal));
+                    return Optional.of(WinningCondition.of(Game.WinningRule.BackDiagonal, backDiagonal));
                 }
 
-                boolean isLeftDiagonalWin = coordinates.containsAll(leftDiagonal);
+                boolean isLeftDiagonalWin = coordinates.containsAll(forwardDiagonal);
 
                 if (isLeftDiagonalWin) {
-                    return Optional.of(WinningCondition.of(Game.WinningRule.Diagonal, leftDiagonal));
+                    return Optional.of(WinningCondition.of(Game.WinningRule.ForwardDiagonal, forwardDiagonal));
                 }
             }
         }

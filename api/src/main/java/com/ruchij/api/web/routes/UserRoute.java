@@ -7,6 +7,7 @@ import com.ruchij.api.service.user.UserService;
 import com.ruchij.api.web.middleware.Authenticator;
 import com.ruchij.api.web.requests.UserRegistrationRequest;
 import com.ruchij.api.web.responses.UserRegistrationResponse;
+import com.ruchij.api.web.responses.UsernameResponse;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
 
@@ -44,6 +45,13 @@ public class UserRoute implements EndpointGroup {
         this.authenticator.get((user, context) -> {
             context.status(HttpStatus.OK).json(user);
         });
+
+        this.authenticator.get("/id/{userId}/username", ((__, context) -> {
+            String userId = context.pathParam("userId");
+            User user = this.userService.getUserById(userId);
+
+            context.status(HttpStatus.OK).json(new UsernameResponse(user.username()));
+        }));
 
         post("/guest", context -> {
             User user = this.userService.registerUser();

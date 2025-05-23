@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.ruchij.api.utils.JsonUtils.objectMapper;
@@ -53,7 +54,7 @@ class ServiceRouteTest {
             clock
         );
 
-        JavalinTest.test(ApiApp.javalin(routes), ((server, client) -> {
+        JavalinTest.test(ApiApp.javalin(routes, List.of()), ((server, client) -> {
             Response response = client.get("/service/info");
             assertEquals(200, response.code());
 

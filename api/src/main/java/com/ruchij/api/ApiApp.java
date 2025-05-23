@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Clock;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,7 +60,7 @@ public class ApiApp {
 
         Routes routes = routes(applicationConfiguration, properties, clock);
 
-        Javalin app = javalin(routes);
+        Javalin app = javalin(routes, applicationConfiguration.httpConfiguration().allowedOrigins());
         ExceptionMapper.handle(app);
         app.start(applicationConfiguration.httpConfiguration().port());
 
@@ -71,7 +73,7 @@ public class ApiApp {
         }));
     }
 
-    public static Javalin javalin(Routes routes) {
+    public static Javalin javalin(Routes routes, List<String> allowedOrigins) {
         return Javalin.create(javalinConfig -> {
             javalinConfig.useVirtualThreads = true;
             javalinConfig.jsonMapper(new JavalinJackson(JsonUtils.objectMapper, true));
@@ -81,12 +83,18 @@ public class ApiApp {
 
             javalinConfig.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> {
-                    rule.allowHost(
-                        "http://localhost:5173",
+                    List<String> allAllowedOrigins = new ArrayList<>(allowedOrigins);
+                    allAllowedOrigins.addAll(List.of(
                         "http://localhost:3000",
-                        "https://tic-tac-toe.home.ruchij.com",
-                        "https://*.tic-tac-toe.home.ruchij.com"
+                        "http://localhost:5173",
+                        "https://tic-tac-toe.home.ruchij.com"
+                    ));
+
+                    rule.allowHost(
+                        "https://*.tic-tac-toe.home.ruchij.com",
+                        allAllowedOrigins.toArray(String[]::new)
                     );
+
                     rule.allowCredentials = true;
                 });
             });

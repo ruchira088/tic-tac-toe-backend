@@ -2,8 +2,21 @@ package com.ruchij.api.config;
 
 import com.typesafe.config.Config;
 
-public record HttpConfiguration(int port) {
+import java.util.Arrays;
+import java.util.List;
+
+public record HttpConfiguration(int port, List<String> allowedOrigins) {
     public static HttpConfiguration parse(Config config) {
-        return new HttpConfiguration(config.getInt("port"));
+        int port = config.getInt("port");
+
+        List<String> allowedOrigins =
+            ConfigReaders.optionalConfig(() -> config.getString("allowed-origins"))
+                .stream()
+                .flatMap(stringValue -> Arrays.stream(stringValue.split(",")))
+                .map(String::trim)
+                .filter(host -> !host.isEmpty())
+                .toList();
+
+        return new HttpConfiguration(port, allowedOrigins);
     }
 }

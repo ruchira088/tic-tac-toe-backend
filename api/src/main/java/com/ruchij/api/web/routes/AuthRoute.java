@@ -24,7 +24,10 @@ public class AuthRoute implements EndpointGroup {
             AuthToken authToken =
                 this.authenticationService.createAuthToken(userLoginRequest.email(), userLoginRequest.password());
 
-            context.status(201).json(authToken);
+            context
+                .status(201)
+                .cookie(Authenticator.COOKIE_NAME, authToken.token())
+                .json(authToken);
         });
 
         delete(context -> {

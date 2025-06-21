@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Clock;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +44,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class ApiApp {
+    private static final List<String> DEFAULT_ALLOWED_ORIGINS = List.of(
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://tic-tac-toe.home.ruchij.com",
+        "https://tic-tac-toe.ruchij.com",
+        "https://*.tic-tac-toe.home.ruchij.com",
+        "https://*.tic-tac-toe.ruchij.com"
+    );
+
     private static final Logger logger = LoggerFactory.getLogger(ApiApp.class);
 
     public static void main(String[] args) throws IOException {
@@ -83,17 +91,8 @@ public class ApiApp {
 
             javalinConfig.bundledPlugins.enableCors(cors -> {
                 cors.addRule(rule -> {
-                    List<String> allAllowedOrigins = new ArrayList<>(allowedOrigins);
-                    allAllowedOrigins.addAll(List.of(
-                        "http://localhost:3000",
-                        "http://localhost:5173",
-                        "https://tic-tac-toe.home.ruchij.com"
-                    ));
-
-                    rule.allowHost(
-                        "https://*.tic-tac-toe.home.ruchij.com",
-                        allAllowedOrigins.toArray(String[]::new)
-                    );
+                    DEFAULT_ALLOWED_ORIGINS.forEach(rule::allowHost);
+                    allowedOrigins.forEach(rule::allowHost);
 
                     rule.allowCredentials = true;
                 });

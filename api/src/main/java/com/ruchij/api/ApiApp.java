@@ -47,8 +47,8 @@ public class ApiApp {
     private static final List<String> DEFAULT_ALLOWED_ORIGINS = List.of(
         "http://localhost:3000",
         "http://localhost:5173",
-        "https://tic-tac-toe.home.ruchij.com",
-        "https://tic-tac-toe.ruchij.com",
+        "https://*.ruchij.com",
+        "https://*.home.ruchij.com",
         "https://*.tic-tac-toe.home.ruchij.com",
         "https://*.tic-tac-toe.ruchij.com"
     );
